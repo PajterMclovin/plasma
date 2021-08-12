@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import argparse
 import sys
 
-sys.path.append('/home/peterhalldestam/DREAM/py/')  # /path/to/DREAM/py
+sys.path.append('../../../../DREAM/py')  # /path/to/DREAM/py
 from DREAM.DREAMSettings import DREAMSettings
 from DREAM.DREAMSettings import DREAMSettings
 import DREAM.Settings.Equations.IonSpecies as Ions
@@ -42,20 +42,20 @@ TEMPERATURE = 100   # [eV]
 
 # command line parser setup
 parser = argparse.ArgumentParser()
-parser.add_argument('-g', type=int, default=CYLINDRICAL_GEOMETRY,
+parser.add_argument('-geom', type=int, default=CYLINDRICAL_GEOMETRY,
                     help='Radial grid geometry (cylindrical = 0, toroidal = 1).')
-parser.add_argument('-E', type=float, default=ELECTRIC_FIELD_STRENGTH,
+parser.add_argument('-efs', type=float, default=ELECTRIC_FIELD_STRENGTH,
                     help='Electric field strength [V/m].')
-parser.add_argument('-T', type=float, default=TEMPERATURE,
+parser.add_argument('-temp', type=float, default=TEMPERATURE,
                     help='Plasma temperature [eV].')
-parser.add_argument('-p', type=bool, default=False, help='Plot geometry.')
+parser.add_argument('-plot', type=bool, default=False, help='Plot geometry.')
 args = parser.parse_args()
 
 # physical parameters
 electron_density = 5e19    # Electron density (m^-3)
-E_field = args.E_field
-temperature = args.temperature
-geometry = args.geometry
+electric_field_strength = args.efs
+temperature = args.temp
+geometry = args.geom
 
 # Grid parameters
 pMax = 1    # maximum momentum in units of m_e*c
@@ -94,34 +94,6 @@ psi = -mu0 * IpRef * (1-(rpsi/a)**2) * a
 
 ds = DREAMSettings()
 
-# Set E_field
-ds.eqsys.E_field.setPrescribedData(E_field)
-
-# Set temperature
-ds.eqsys.T_cold.setPrescribedData(temperature)
-
-# Set ions
-ds.eqsys.n_i.addIon(name='D', Z=1, iontype=Ions.IONS_PRESCRIBED_FULLY_IONIZED, n=electron_density)
-
-# Disable avalanche generation
-ds.eqsys.n_re.setAvalanche(avalanche=Runaways.AVALANCHE_MODE_NEGLECT)
-
-# Hot-tail grid settings
-ds.hottailgrid.setNxi(Nxi)
-ds.hottailgrid.setNp(Np)
-ds.hottailgrid.setPmax(pMax)
-
-# Set initial hot electron Maxwellian
-ds.eqsys.f_hot.setInitialProfiles(n0=electron_density, T0=temperature)
-
-# Set boundary condition type at pMax
-ds.eqsys.f_hot.setBoundaryCondition(DistFunc.BC_F_0) # F=0 outside the boundary
-ds.eqsys.f_hot.setSynchrotronMode(DistFunc.SYNCHROTRON_MODE_NEGLECT)
-ds.eqsys.f_hot.setAdvectionInterpolationMethod(DistFunc.AD_INTERP_UPWIND)
-
-# Disable runaway grid
-ds.runawaygrid.setEnabled(False)
-
 # Set up radial grid
 if geometry == CYLINDRICAL_GEOMETRY:
     print('setting up a cylindrical geometry')
@@ -149,6 +121,34 @@ ds.radialgrid.setNr(Nr)
 
 if args.plot:
     ds.radialgrid.visualize_analytic(nr=10, ntheta=100)
+
+# Set E_field
+ds.eqsys.E_field.setPrescribedData(electric_field_strength)
+
+# Set temperature
+ds.eqsys.T_cold.setPrescribedData(temperature)
+
+# Set ions
+ds.eqsys.n_i.addIon(name='D', Z=1, iontype=Ions.IONS_PRESCRIBED_FULLY_IONIZED, n=electron_density)
+
+# Disable avalanche generation
+ds.eqsys.n_re.setAvalanche(avalanche=Runaways.AVALANCHE_MODE_NEGLECT)
+
+# Hot-tail grid settings
+ds.hottailgrid.setNxi(Nxi)
+ds.hottailgrid.setNp(Np)
+ds.hottailgrid.setPmax(pMax)
+
+# Set initial hot electron Maxwellian
+ds.eqsys.f_hot.setInitialProfiles(n0=electron_density, T0=temperature)
+
+# Set boundary condition type at pMax
+ds.eqsys.f_hot.setBoundaryCondition(DistFunc.BC_F_0) # F=0 outside the boundary
+ds.eqsys.f_hot.setSynchrotronMode(DistFunc.SYNCHROTRON_MODE_NEGLECT)
+ds.eqsys.f_hot.setAdvectionInterpolationMethod(DistFunc.AD_INTERP_UPWIND)
+
+# Disable runaway grid
+ds.runawaygrid.setEnabled(False)
 
 # Set solver type
 ds.solver.setType(Solver.LINEAR_IMPLICIT) # semi-implicit time stepping
