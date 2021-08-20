@@ -1,12 +1,17 @@
 #!/bin/sh
 # Created by Peter Halldestam 19/8/21.
 #
-# clearDREAMFiles.sh: Removes all dream_settings and output files.
+# clear.sh: Removes all dream_settings and output files.
+#
 #
 
 DREAM_SETTINGS_DIR="./dream_settings/"
 DREAM_OUTPUTS_DIR="./outputs/"
 
+## make sure cwd is script dir
+cd "${0%/*}"
+
+## check if empty and confirm removal
 if test -z "$(ls $DREAM_SETTINGS_DIR)" || test -z "$(ls $DREAM_OUTPUTS_DIR)"
 then
     echo "No old files detected."

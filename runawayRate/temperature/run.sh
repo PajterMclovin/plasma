@@ -9,7 +9,11 @@ DREAM_PATH="/home/peterhalldestam/DREAM/" # /path/to/DREAM/
 DREAMI_PATH="${DREAM_PATH}build/iface/dreami"
 DREAM_SETTINGS_DIR="./dream_settings/"
 DREAM_OUTPUTS_DIR="./outputs/"
-GENERATE_SETTINGS="generateElectricScan.py" # "generateTemperatureScan.py"
+GENERATE_SETTINGS="generateTemperatureScan.py"
+VISUALIZE="../visualize.py"
+
+## make sure cwd is script dir
+cd "${0%/*}"
 
 ## create new dream_settings files OR use old OR quit
 mkdir -p $DREAM_SETTINGS_DIR
@@ -71,3 +75,6 @@ for settings_file in $DREAM_SETTINGS_DIR*.h5
 do
     /.$DREAMI_PATH $settings_file
 done
+
+## plot runaway rates and compare
+python3 $VISUALIZE

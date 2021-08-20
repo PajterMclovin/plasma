@@ -5,16 +5,17 @@ Created by Peter Halldestam 19/8/21.
 import sys
 import numpy as np
 
-sys.path.append('../../../../DREAM/py')  # /path/to/DREAM/py
+# Physical parameters import
+sys.path.append('../..')
+import parameters as p
+
+sys.path.append(p.DREAM_PATH)
 from DREAM.DREAMSettings import DREAMSettings
 from DREAM.Settings.Equations import IonSpecies
 from DREAM.Settings.Equations import RunawayElectrons
 from DREAM.Settings.Equations import DistributionFunction
 from DREAM.Settings import Solver
 
-# Physical parameters import
-sys.path.append('../..')
-import parameters as p
 
 # geometries
 CYLINDRICAL = 0
