@@ -2,13 +2,16 @@
 """
 Created by Peter Halldestam 19/8/21.
 """
-import sys
+import sys, os
 import numpy as np
 
-# Physical parameters import
-sys.path.append('../..')
+dir = os.path.dirname(os.path.realpath(__file__))
+
+# Parameters import
+sys.path.append(os.path.join(dir, '..'))
 import parameters as p
 
+# Settings object imports
 sys.path.append(p.DREAM_PATH)
 from DREAM.DREAMSettings import DREAMSettings
 from DREAM.Settings.Equations import IonSpecies
@@ -132,6 +135,29 @@ def configureEquations(ds, electricField=None, temperature=None, verbose=False):
     ds.solver.setType(Solver.LINEAR_IMPLICIT) # semi-implicit time stepping
     ds.solver.preconditioner.setEnabled(False)
 
+## helper function(s) for plotting DREAM output data
+
+def plotRunawayRate(do, ax=None, label=None):
+    """
+    Plot runaway rate vs. time to check convergence.
+
+    DREAM.DREAMOutput do :      DREAM settings object.
+    matplotlib.axes.Axes ax :   Axes object used for plotting.
+    str label :                 Legend label.
+    """
+    if ax is None:
+        ax = plt.axes()
+
+    # load relevant DREAM output quantities
+    try:
+        time = do.other.fluid.runawayRate.time
+        runawayRate = do.other.fluid.runawayRate.data[:,0]
+    except AttributeError as err:
+        raise Exception(f'Output file {fp} does not include .') from err
+
+    # plot runaway rate vs time
+    ax.semilogy(time, runawayRate, label=label)
+    return ax
 
 
 ## If script is run, create default DREAM settings as demo

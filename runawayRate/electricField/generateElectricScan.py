@@ -21,7 +21,6 @@ import configureDREAM as c
 sys.path.append(p.DREAM_PATH)
 from DREAM.DREAMSettings import DREAMSettings
 
-
 # Scan parameters
 nScanValues = 2
 scanValues = p.ELECTRIC_FIELD * np.linspace(1e-1, 1, nScanValues)

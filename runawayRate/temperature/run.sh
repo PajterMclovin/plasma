@@ -10,7 +10,7 @@ DREAMI_PATH="${DREAM_PATH}build/iface/dreami"
 DREAM_SETTINGS_DIR="./dream_settings/"
 DREAM_OUTPUTS_DIR="./outputs/"
 GENERATE_SETTINGS="generateTemperatureScan.py"
-VISUALIZE="../visualize.py"
+VISUALIZE="visualize.py"
 
 ## make sure cwd is script dir
 cd "${0%/*}"

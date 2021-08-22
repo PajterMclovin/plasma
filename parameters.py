@@ -2,9 +2,15 @@
 Collection of constant parameters used throughout in this project.
 """
 import numpy as np
+import sys
 
-# paths
+# make sure path to DREAM exists
 DREAM_PATH = '/home/peterhalldestam/DREAM/py'  # /path/to/DREAM/py
+try:
+    sys.path.append(DREAM_PATH)
+    import DREAM
+except ModuleNotFoundError as err:
+    raise Exception(f'DREAM_PATH={DREAM_PATH} does not exist!') from err
 
 # default parameters
 ELECTRON_DENSITY = 5e19 # [m^-3]
