@@ -31,9 +31,9 @@ def configureGrids(ds, geometry=CYLINDRICAL, verbose=False):
     """
     Configure numerical grids.
 
-    :param DREAMSettings ds:    Settings object to configure.
-    :param int geometry:        Type of geometry (0=cylindrical, 1=toroidal).
-    :param bool verbose:        Show more information during program if True.
+    DREAM.DREAMSettings ds :    Settings object to configure.
+    int geometry :              Type of geometry (0=cylindrical, 1=toroidal).
+    bool verbose :              Show more information during program if True.
     """
     # Toroidal field function
     GOverR0 = p.MAGNETIC_FIELD     # = R*Bphi/R0
@@ -99,10 +99,10 @@ def configureEquations(ds, electricField=None, temperature=None, verbose=False):
     """
     Configure equation system.
 
-    :param DREAMSettings ds:        Settings object to configure.
-    :param float electric_field:    Prescribed electric field strength.
-    :param float temperature:       Prescribed temperature:
-    :param bool verbose:            Show more information during program if True.
+    DREAMSettings ds :      Settings object to configure.
+    float electric_field :  Prescribed electric field strength.
+    float temperature :     Prescribed temperature:
+    bool verbose :          Show more information during program if True.
     """
     # set electric field
     if electricField is None:
@@ -158,6 +158,7 @@ def plotRunawayRate(do, ax=None, label=None):
     # plot runaway rate vs time
     ax.semilogy(time, runawayRate, label=label)
     return ax
+
 
 
 ## If script is run, create default DREAM settings as demo
