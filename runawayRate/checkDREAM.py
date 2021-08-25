@@ -23,7 +23,7 @@ from DREAM.DREAMOutput import DREAMOutput
 def checkElectronDensityRatio(do, interupt=False):
     """
     Checks whether given output contains instances where the assumption
-    n_re << n_cold or not. It is invalid when the ratio n_re / n_cold is smaller
+    n_re << n_cold or not. It is invalid when the ratio n_re / n_cold is greater
     that some tolerance TOL_ELECTRON_DENSITY_RATIO (defined in parameters.py).
     If invalid, a warning is shown (or exception if interupt is True).
 
@@ -49,6 +49,7 @@ def checkRunawayRateConvergence(do, interupt=False):
     is smaller than some tolerance.
     The percentage at which the rates are compared is specified by LIM_RUNAWAY_RATE_CONVERGENCE
     and the tolerance is specified by TOL_RUNAWAY_RATE_CONVERGENCE (defined in parameters.py).
+    If the runaway rate has not converged, a warning is shown (or exception if interupt is True).
     
     DREAM.DREAMOutput do :  DREAM output object.
     bool interupt :         Interupts program by raising an exception rather
