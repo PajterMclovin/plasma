@@ -1,7 +1,7 @@
 #!/bin/python3
 """
-Created by Peter Halldestam 19/8/21.
-Modified by Hannes Bergström.
+Created by Peter Halldestam 19/8/2021.
+Modified by Hannes Bergström 23/8/2021.
 
 Visualizes DREAM output data for a range of electric fields.
 """
@@ -31,7 +31,7 @@ outputDir = os.path.join(dir, 'outputs')
 if __name__ == '__main__':
 
     fig, ax = plt.subplots()
-    
+
     # visualize specified output
     if len(sys.argv) == 2:
         ax = plotRunawayRate(sys.argv[1])

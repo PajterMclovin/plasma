@@ -69,11 +69,28 @@ else
 fi
 echo ""
 
+# count DREAM settings
+n=0
+for settings_file in $DREAM_OUTPUTS_DIR*.h5
+do
+    n=$((n+1))
+done
+
+
 ## run DREAM simulations
 echo "Run DREAM using $DREAMI_PATH."
+i=0
 for settings_file in $DREAM_SETTINGS_DIR*.h5
 do
+    i=$((i+1))
+    echo "Running simulation $i/$n"
     /.$DREAMI_PATH $settings_file
+done
+
+## check DREAM outputs
+for output_file in $DREAM_OUTPUTS_DIR*.h5
+do
+    python3 ../checkDREAM.py $output_file
 done
 
 ## plot runaway rates and compare

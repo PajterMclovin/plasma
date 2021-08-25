@@ -45,3 +45,6 @@ N_POLODIAL_FLUX   = 20  # no. poloidal flux grid points
 N_SHAFRANOV_SHIFT = 20  # no. Shafranov shift grid point
 N_TRIANGULARITY   = 20  # no. triangularity grid points
 N_ELONGATION      = 20  # no. elongation grid points
+
+# check output parameters
+TOL_ELECTRON_DENSITY_RATIO = 0.01
