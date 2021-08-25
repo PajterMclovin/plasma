@@ -22,21 +22,22 @@ sys.path.append(p.DREAM_PATH)
 from DREAM.DREAMSettings import DREAMSettings
 
 # Scan parameters
-nScanValues = 2
-scanValues = p.ELECTRIC_FIELD * np.linspace(1e-1, 1, nScanValues)
+nScanValues = 3
+scanValues = p.ELECTRIC_FIELD * np.linspace(.9, 1.2, nScanValues)
 
 
 if __name__ == "__main__":
 
-    for electricField in scanValues:
+    for i, electricField in enumerate(scanValues):
 
+        print(i)
         # Cylindrical geometry
         ds1 = DREAMSettings()
         c.configureGrids(ds1, geometry=c.CYLINDRICAL)
         c.configureEquations(ds1, electricField=electricField)
-        ds1.output.setFilename(F'outputs/output_cyl_E={electricField:2.3}.h5')
+        ds1.output.setFilename(f'outputs/output_cyl{i}.h5')
         ds1.other.include('fluid/runawayRate')
-        ds1.save(f'dream_settings/settings_cyl_E={electricField:2.3}.h5')
+        ds1.save(f'dream_settings/settings_cyl{i}.h5')
 
         # Toroidal geometry
         # ds2 = DREAMSettings()

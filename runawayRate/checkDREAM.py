@@ -3,6 +3,7 @@
 Created by Peter Halldestam 23/8/2021.
 Modified by Hannes Bergström.
 
+This file contains helper functions for quick
 
 """
 import sys, os, warnings
@@ -71,8 +72,11 @@ def checkRunawayRateConvergence(do, interupt=False):
 
 if __name__ == '__main__':
 
+    print(sys.argv[1])
     if not len(sys.argv) == 2:
+        print(sys.argv)
         raise Exception('Must include one argument being the DREAM output file.')
+
 
     do = DREAMOutput(sys.argv[1])
     checkElectronDensityRatio(do, interupt=True)

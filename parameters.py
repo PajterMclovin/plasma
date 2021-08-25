@@ -46,7 +46,13 @@ N_SHAFRANOV_SHIFT = 20  # no. Shafranov shift grid point
 N_TRIANGULARITY   = 20  # no. triangularity grid points
 N_ELONGATION      = 20  # no. elongation grid points
 
+<<<<<<< HEAD
 # Simulation limits
 TOL_ELECTRON_DENSITY_RATIO = 0.1 # ...
 TOL_RUNAWAY_RATE_CONVERGENCE = 1e-1 # ...
+LIM_RUNAWAY_RATE_CONVERGENCE = 0.8
+=======
+# check output parameters
+TOL_ELECTRON_DENSITY_RATIO = 0.01
+TOL_RUNAWAY_RATE_CONVERGENCE = 0.1
 LIM_RUNAWAY_RATE_CONVERGENCE = 0.8
