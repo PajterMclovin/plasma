@@ -1,6 +1,7 @@
 #!/bin/python3
 """
 Created by Peter Halldestam 23/8/2021.
+Modified by Hannes Bergström.
 
 
 """
@@ -41,15 +42,26 @@ def checkElectronDensityRatio(do, interupt=False):
 
 def checkRunawayRateConvergence(do, interupt=False):
     """
-
-        Hannes du kirrar denna tack!
-
+    Checks if the runaway rate in the given output has converged with respect to time.
+    It is considered to have converged if the relative difference between the runaway rate
+    at the last time step and the runaway rate at some percentage of the total simulated time
+    is smaller than some tolerance.
+    The percentage at which the rates are compared is specified by LIM_RUNAWAY_RATE_CONVERGENCE
+    and the tolerance is specified by TOL_RUNAWAY_RATE_CONVERGENCE (defined in parameters.py).
+    
+    DREAM.DREAMOutput do :  DREAM output object.
+    bool interupt :         Interupts program by raising an exception rather
+                            than only showing a warning.
     """
-    runawarRate = do.other.fluid.runawayRate.data
-
+    runawayRate = do.other.fluid.runawayRate.data
+    sample = int(p.LIM_RUNAWAY_RATE_CONVERGENCE * (runawayRate.shape[0]-1))
+    
     converged = False
-    if converged:
-        msg = "holy shit!"
+    if np.max(np.abs(runawayRate[-1] - runawayRate[sample]) / runawayRate[-1]) < p.TOL_RUNAWAY_RATE_CONVERGENCE:
+    	converged = True
+    
+    if not converged:
+        msg = f"\n\nTransient convergence of runaway rate not obtained in {do.filename}. Convergence after {p.LIM_RUNAWAY_RATE_CONVERGENCE*100}% is not within {p.TOL_RUNAWAY_RATE_CONVERGENCE}"
         if interupt:
             raise Exception(msg)
         else:
@@ -64,4 +76,4 @@ if __name__ == '__main__':
 
     do = DREAMOutput(sys.argv[1])
     checkElectronDensityRatio(do, interupt=True)
-    # checkRunawayRateConvergence(do, interupt=True)
+    checkRunawayRateConvergence(do, interupt=True)

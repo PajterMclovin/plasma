@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 # make sure path to DREAM exists
-DREAM_PATH = '/home/peterhalldestam/DREAM/py'  # /path/to/DREAM/py
+DREAM_PATH = '/home/hannber/DREAM/py'  # /path/to/DREAM/py
 try:
     sys.path.append(DREAM_PATH)
     import DREAM
@@ -45,3 +45,8 @@ N_POLODIAL_FLUX   = 20  # no. poloidal flux grid points
 N_SHAFRANOV_SHIFT = 20  # no. Shafranov shift grid point
 N_TRIANGULARITY   = 20  # no. triangularity grid points
 N_ELONGATION      = 20  # no. elongation grid points
+
+# Simulation limits
+TOL_ELECTRON_DENSITY_RATIO = 0.1 # ...
+TOL_RUNAWAY_RATE_CONVERGENCE = 1e-1 # ...
+LIM_RUNAWAY_RATE_CONVERGENCE = 0.8
