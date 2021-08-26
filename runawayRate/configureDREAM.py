@@ -1,6 +1,7 @@
 #!/bin/python3
 """
 Created by Peter Halldestam 19/8/21.
+Modified by Hannes Bergström 26/8/21
 """
 import sys, os
 import numpy as np
@@ -35,23 +36,32 @@ def configureGrids(ds, geometry=CYLINDRICAL, verbose=False):
     int geometry :              Type of geometry (0=cylindrical, 1=toroidal).
     bool verbose :              Show more information during program if True.
     """
-    # Toroidal field function
-    GOverR0 = p.MAGNETIC_FIELD     # = R*Bphi/R0
-
-    # Poloidal flux
-    rpsi   = np.linspace(0, p.MINOR_RADIUS, p.N_POLODIAL_FLUX)
-    psi = -p.MU_0 * p.PLASMA_CURRENT * (1-(rpsi / p.MINOR_RADIUS)**2) * p.MINOR_RADIUS
 
     if geometry == CYLINDRICAL:
         if verbose:
             print('setting up a cylindrical geometry')
-
+	
+        # set type (1 = Cylindrical)
+        ds.radialgrid.setType(1)
         # set radial grid shape
-        ds.radialgrid.setShaping(psi=psi, rpsi=rpsi, GOverR0=GOverR0)
+        
+        
+        #ds.radialgrid.setShaping(psi=psi, rpsi=rpsi, GOverR0=GOverR0)
+        ds.radialgrid.setB0(p.MAGNETIC_FIELD)
 
     elif geometry == TOROIDAL:
         if verbose:
             print('setting up a toroidal geometry (ITER tokamak?)')
+        
+        # set type (2 = Analytic toroidal)
+        ds.radialgrid.setType(2)
+        
+        # Toroidal field function
+        GOverR0 = p.MAGNETIC_FIELD     # = R*Bphi/R0
+        
+        # Poloidal flux
+        rpsi   = np.linspace(0, p.MINOR_RADIUS, p.N_POLODIAL_FLUX)
+        psi = -p.MU_0 * p.PLASMA_CURRENT * (1-(rpsi / p.MINOR_RADIUS)**2) * p.MINOR_RADIUS
 
         # Set up input radial grids
         rDelta = np.linspace(0, p.MINOR_RADIUS, p.N_SHAFRANOV_SHIFT)
@@ -64,6 +74,7 @@ def configureGrids(ds, geometry=CYLINDRICAL, verbose=False):
         kappa = np.linspace(0, p.MAX_ELONGATION, p.N_ELONGATION)
 
         # set radial grid shape
+        ds.radialgrid.setMajorRadius(p.MAJOR_RADIUS)
         ds.radialgrid.setShaping(psi=psi, rpsi=rpsi, GOverR0=GOverR0,
                                  kappa=kappa, rkappa=rkappa,
                                  Delta=Delta, rDelta=rDelta,
@@ -75,10 +86,8 @@ def configureGrids(ds, geometry=CYLINDRICAL, verbose=False):
     else:
         raise ValueError("Invalid geometry input!")
 
-    # radial grid settings
-    ds.radialgrid.setB0(p.MAGNETIC_FIELD)
+    # general radial grid settings
     ds.radialgrid.setWallRadius(p.WALL_RADIUS)
-    ds.radialgrid.setMajorRadius(p.MAJOR_RADIUS)
     ds.radialgrid.setMinorRadius(p.MINOR_RADIUS)
     ds.radialgrid.setNr(p.N_RADIUS)
 
