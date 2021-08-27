@@ -7,6 +7,7 @@ Visualizes DREAM output data for with respect to electric field strength.
 # do.grid.effectivePassingFraction
 
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 import sys, os, glob
 
@@ -32,7 +33,7 @@ def plotRadialProfile(ax, files, geometry = None):
       if not geometry or geometry == 'toroidal':
          ax.plot(runawayRate, '-', label = f'{do.eqsys.E_field[0,0]}')
       elif geometry == 'cylindrical':
-         ax.plot(runawayRate, '--')
+         ax.plot(runawayRate, 'k--')
       else:
          raise Exception('\nInvalid geometry\n')
 
@@ -58,10 +59,17 @@ if __name__ == '__main__':
           ax.legend(title = 'electric field [V/m]')
           
        # plots the effective passing fraction
-       fp = torFiles[0]
+       fp = torFiles[1]
        do = DREAMOutput(os.path.join(outputDir, fp))
        effPassing = do.grid.effectivePassingFraction
-       ax.plot(effPassing, '.')
+       ax.plot(effPassing, 'k:')
+       
+       custom_lines = [Line2D([0], [0], color = 'k', ls = '-'), 
+       Line2D([0], [0], color= 'k', ls = '--'), 
+       Line2D([0], [0], color= 'k', ls = ':')]
+       
+       ax2 = ax.twinx()
+       ax2.legend(custom_lines,['toroidal geometry', 'cylindric geometry', 'effective passing fraction'], loc = 7)
        
     elif cylFiles:
        print('\nCylindrical measurement data found.\n')
@@ -74,6 +82,6 @@ if __name__ == '__main__':
     
     
     # plot settings
-    plt.ylabel(r'runaway rate [$s^{-1}m^{-3}$]')
+    plt.ylabel('relative runaway rate')
     plt.xlabel('radial grid point')
     plt.show()
