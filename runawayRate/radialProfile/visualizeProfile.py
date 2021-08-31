@@ -4,12 +4,11 @@ Created by Hannes Bergström 26/8/2021.
 
 Visualizes DREAM output data for with respect to electric field strength.
 """
-# do.grid.effectivePassingFraction
 
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 import numpy as np
 import sys, os, glob
+from matplotlib.lines import Line2D
 
 dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -29,11 +28,12 @@ def plotRadialProfile(ax, files, geometry = None):
    for fp in files:
       do = DREAMOutput(os.path.join(outputDir, fp))
       runawayRate = do.other.fluid.runawayRate.data[-1,:] / do.other.fluid.runawayRate.data[-1,0] 
+      minorRC = do.grid.r
    	
       if not geometry or geometry == 'toroidal':
-         ax.plot(runawayRate, '-', label = f'{do.eqsys.E_field[0,0]}')
+         ax.plot(minorRC, runawayRate, '-', label = f'{do.eqsys.E_field[0,0]}')
       elif geometry == 'cylindrical':
-         ax.plot(runawayRate, 'k--')
+         ax.plot(minorRC, runawayRate, 'k--')
       else:
          raise Exception('\nInvalid geometry\n')
 
@@ -45,8 +45,8 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
     
-    cylFiles = glob.glob(outputDir+'/*cyl*.h5')
-    torFiles = glob.glob(outputDir+'/*tor*.h5')
+    cylFiles = sorted(glob.glob(outputDir+'/*cyl*.h5'))
+    torFiles = sorted(glob.glob(outputDir+'/*tor*.h5'))
     
     if cylFiles and torFiles:
        print('\nCylindrical and toroidal simulation data found, ploting both.\n')
@@ -59,10 +59,11 @@ if __name__ == '__main__':
           ax.legend(title = 'electric field [V/m]')
           
        # plots the effective passing fraction
-       fp = torFiles[1]
+       fp = torFiles[0]
        do = DREAMOutput(os.path.join(outputDir, fp))
        effPassing = do.grid.effectivePassingFraction
-       ax.plot(effPassing, 'k:')
+       minorRC = do.grid.r
+       ax.plot(minorRC, effPassing, 'k:')
        
        custom_lines = [Line2D([0], [0], color = 'k', ls = '-'), 
        Line2D([0], [0], color= 'k', ls = '--'), 
@@ -72,16 +73,16 @@ if __name__ == '__main__':
        ax2.legend(custom_lines,['toroidal geometry', 'cylindric geometry', 'effective passing fraction'], loc = 7)
        
     elif cylFiles:
-       print('\nCylindrical measurement data found.\n')
+       print('\nCylindrical simulation data found.\n')
        plotElectricScan(ax, cylFiles)
     elif torFiles:
-       print('\nToroidal measurement data found.\n')
+       print('\nToroidal simulation data found.\n')
        plotElectricScan(ax, torFiles)
     else:
-       raise Exception('\nNo measurement data found.\n')
+       raise Exception('\nNo simulation data found.\n')
     
     
     # plot settings
-    plt.ylabel('relative runaway rate')
-    plt.xlabel('radial grid point')
+    ax.set_ylabel('relative runaway rate')
+    ax.set_xlabel('minor radial coordinate [m]')
     plt.show()
