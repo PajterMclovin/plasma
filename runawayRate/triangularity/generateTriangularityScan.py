@@ -25,7 +25,7 @@ from DREAM.DREAMSettings import DREAMSettings
 
 # Scan parameters
 nScanValues = 3
-scanValues = p.MAX_TRIANGULARITY * np.linspace(.5, 10, nScanValues)
+scanValues = p.MAX_TRIANGULARITY * np.linspace(.5, 2, nScanValues)
 
 
 def configureGrids(ds, maxTriangularity=None, verbose=False, visualize=False):
