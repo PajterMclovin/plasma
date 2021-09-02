@@ -146,26 +146,38 @@ def configureEquations(ds, electricField=None, temperature=None, verbose=False):
 
 ## helper function(s) for plotting DREAM output data
 
-def plotRunawayRate(do, ax=None, label=None):
+def plotRunawayRate(do, ax=None, label=None, normalize=False, plotTime=False):
     """
     Plot runaway rate vs. time to check convergence.
 
     DREAM.DREAMOutput do :      DREAM settings object.
     matplotlib.axes.Axes ax :   Axes object used for plotting.
     str label :                 Legend label.
+    bool normalize :            Normalize such that runawayRate=1 at time=minorRadius=0.
+    bool plotTime :             x=time if True, otherwise x=minorRadius.
     """
     if ax is None:
         ax = plt.axes()
 
-    # load relevant DREAM output quantities
     try:
-        time = do.other.fluid.runawayRate.time
-        runawayRate = do.other.fluid.runawayRate.data[:,0]
+        data = do.other.fluid.runawayRate.data
     except AttributeError as err:
         raise Exception(f'Output file {fp} does not include .') from err
 
-    # plot runaway rate vs time
-    ax.semilogy(time, runawayRate, label=label)
+    if normalize:
+        print(data[0,0], data[0])
+        data /= data[0,0]
+
+    if plotTime: # runawayRate vs. time
+        time = do.other.fluid.runawayRate.time
+        runawayRate = data[:,0]
+        ax.semilogy(time, runawayRate, label=label)
+
+    else: # runawayRate vs. minorRadius
+        minorRadius = do.grid.r
+        runawayRate = data[0,:]
+        ax.plot(minorRadius, runawayRate, label=label)
+
     return ax
 
 
