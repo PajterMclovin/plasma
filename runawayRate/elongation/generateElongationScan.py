@@ -1,6 +1,10 @@
-#!/bin/python3
+#!/usr/bin/python3
 """
 Created by Peter Halldestam 1/9/21.
+
+Generates DREAM settings files for a range of elongation maxima (geometric parameter).
+Add any single command line argument when running this script to visualize the magnetic
+field
 """
 import sys, os
 import numpy as np
@@ -20,8 +24,8 @@ sys.path.append(p.DREAM_PATH)
 from DREAM.DREAMSettings import DREAMSettings
 
 # Scan parameters
-nScanValues = 6
-scanValues = p.MAX_ELONGATION * np.linspace(.1, 10, nScanValues)
+nScanValues = 3
+scanValues = p.MAX_ELONGATION * np.linspace(.9, 1.1, nScanValues)
 
 
 def configureGrids(ds, max_elongation=None, verbose=False, visualize=False):
@@ -57,6 +61,7 @@ def configureGrids(ds, max_elongation=None, verbose=False, visualize=False):
         max_elongation = p.MAX_ELONGATION
     elif max_elongation < 0:
         pass
+    else: print(max_elongation)
 
     kappa = np.linspace(0, max_elongation, p.N_ELONGATION)
 
@@ -96,18 +101,10 @@ if __name__ == "__main__":
 
     for max_elongation in scanValues:
 
-        # Cylindrical geometry
+    	# Generate DREAM setting with torodial geometry with varying maximum elongation
         ds = DREAMSettings()
-        configureGrids(ds, max_elongation=max_elongation, visualize=True)
+        configureGrids(ds, max_elongation=max_elongation, visualize=(len(sys.argv)==2))
         configureEquations(ds)
         ds.output.setFilename(f'outputs/output{max_elongation}.h5')
         ds.other.include('fluid/runawayRate')
         ds.save(f'dream_settings/settings{max_elongation}.h5')
-
-        # Toroidal geometry
-        # ds2 = DREAMSettings()
-        # c.configureGrids(ds2, geometry=c.TOROIDAL)
-        # c.configureEquations(ds2, electricField=electricField)
-        # ds2.output.setFilename(F'outputs/output_tor_E={electricField:2.3}.h5')
-        # ds2.other.include('fluid/runawayRate')
-        # ds2.save(f'dream_settings/settings_tor_E={electricField:2.3}.h5')
