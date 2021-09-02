@@ -165,7 +165,6 @@ def plotRunawayRate(do, ax=None, label=None, normalize=False, plotTime=False):
         raise Exception(f'Output file {fp} does not include .') from err
 
     if normalize:
-        print(data[0,0], data[0])
         data /= data[0,0]
 
     if plotTime: # runawayRate vs. time

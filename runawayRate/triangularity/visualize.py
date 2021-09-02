@@ -20,7 +20,6 @@ sys.path.append(os.path.join(dir, '../..'))
 from parameters import DREAM_PATH
 sys.path.append(DREAM_PATH)
 from DREAM.DREAMOutput import DREAMOutput
-from DREAM.DREAMSettings import DREAMSettings
 
 sys.path.append(os.path.join(dir, 'outputs'))
 outputDir = os.path.join(dir, 'outputs')
@@ -38,7 +37,6 @@ elif len(sys.argv) == 1:
         if fp.endswith(".h5"):
             outputFile = os.path.join(outputDir, fp)
             do = DREAMOutput(outputFile)
-            ds = DREAMSettings().fromOutput(outputFile)
             maxTriangularity = fp[len('output'):-3]
             ax = plotRunawayRate(do, ax=ax, label=maxTriangularity, normalize=True)
 
