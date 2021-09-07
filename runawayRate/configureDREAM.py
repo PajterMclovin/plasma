@@ -165,7 +165,7 @@ class ConfigureDREAM:
     def configureEquations(self):
         """
         Configuring equation system in DREAM settings object. This method is
-        subject to change if/when further configurations is needed.
+        subject to change if/when further configurations are needed.
         """
         if self.verbose:
             print(self.configureEquations.__doc__)
