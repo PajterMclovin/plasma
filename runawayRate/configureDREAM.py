@@ -87,7 +87,7 @@ class ConfigureDREAM:
         Setting up a toroidal geometry.
         """
         if self.verbose:
-            print(configureEquations.__doc__)
+            print(self.setToroidal.__doc__)
 
         ds = self.ds
 
@@ -127,7 +127,7 @@ class ConfigureDREAM:
         Configuring grids in DREAM settings object.
         """
         if self.verbose:
-            print(configureEquations.__doc__)
+            print(self.configureGrids.__doc__)
 
         ds = self.ds
 
@@ -168,7 +168,7 @@ class ConfigureDREAM:
         subject to change if/when further configurations is needed.
         """
         if self.verbose:
-            print(configureEquations.__doc__)
+            print(self.configureEquations.__doc__)
 
         ds = self.ds
 
