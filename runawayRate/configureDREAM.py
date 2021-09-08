@@ -21,8 +21,8 @@ from DREAM.Settings.Equations.IonSpecies import IONS_PRESCRIBED_FULLY_IONIZED
 from DREAM.Settings.Equations.RunawayElectrons import AVALANCHE_MODE_NEGLECT
 from DREAM.Settings.Equations.DistributionFunction import BC_F_0
 from DREAM.Settings.Equations.DistributionFunction import SYNCHROTRON_MODE_NEGLECT
-from DREAM.Settings.Equations.DistributionFunction import AD_INTERP_UPWIND
-from DREAM.Settings.Solver import LINEAR_IMPLICIT
+from DREAM.Settings.Equations.DistributionFunction import AD_INTERP_UPWIND, AD_INTERP_TCDF, AD_INTERP_JACOBIAN_UPWIND
+from DREAM.Settings.Solver import LINEAR_IMPLICIT, NONLINEAR
 
 # Geometries
 CYLINDRICAL = 1
@@ -188,10 +188,11 @@ class ConfigureDREAM:
         # Set boundary condition type at pMax
         ds.eqsys.f_hot.setBoundaryCondition(BC_F_0) # F=0 outside the boundary
         ds.eqsys.f_hot.setSynchrotronMode(SYNCHROTRON_MODE_NEGLECT)
-        ds.eqsys.f_hot.setAdvectionInterpolationMethod(AD_INTERP_UPWIND)
+        ds.eqsys.f_hot.setAdvectionInterpolationMethod(ad_int=AD_INTERP_TCDF,
+   ad_jac=AD_INTERP_JACOBIAN_UPWIND)
 
         # Set solver type
-        ds.solver.setType(LINEAR_IMPLICIT) # semi-implicit time stepping
+        ds.solver.setType(NONLINEAR) # semi-implicit time stepping
         ds.solver.preconditioner.setEnabled(False)
 
 
