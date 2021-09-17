@@ -2,7 +2,8 @@
 """
 Created by Peter Halldestam 19/8/21,
 modified by Hannes Bergström 26/8/21,
-modified by Peter Halldestam 4/9/21.
+modified by Peter Halldestam 4/9/21,
+modified by Hannes Bergström 8/9/21.
 """
 import sys, os
 import numpy as np
@@ -47,6 +48,7 @@ class ConfigureDREAM:
             float maxElongation :       Shaping parameter.
             float maxTriangularity :    Shaping parameter.
             float maxShafranovShift :   Shaping parameter.
+            tuple ion :                 Name and proton number pair describing the type of ion used in the plasma.
 
         """
         self.verbose            = kwargs.get('verbose',             False)
@@ -58,6 +60,7 @@ class ConfigureDREAM:
         self.maxElongation      = kwargs.get('maxElongation',       p.MAX_ELONGATION)
         self.maxTriangularity   = kwargs.get('maxTriangularity',    p.MAX_TRIANGULARITY)
         self.maxShafranovShift  = kwargs.get('maxShafranovShift',   p.MAX_SHAFRANOV_SHIFT)
+        self.ion                = kwargs.get('ion',                 ('D', 1))
 
         # Create and configure DREAM settings
         if self.ds is None:
@@ -179,7 +182,7 @@ class ConfigureDREAM:
         ds.eqsys.f_hot.setInitialProfiles(n0=p.ELECTRON_DENSITY, T0=self.temperature)
 
         # Set ions
-        ds.eqsys.n_i.addIon(name='D', Z=1, n=p.ELECTRON_DENSITY,
+        ds.eqsys.n_i.addIon(name=self.ion[0], Z=self.ion[1], n=p.ELECTRON_DENSITY/self.ion[1],
                             iontype=IONS_PRESCRIBED_FULLY_IONIZED)
 
         # Disable avalanche generation
