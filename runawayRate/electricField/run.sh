@@ -1,14 +1,14 @@
-#!/bin/sh
+ 	 	#!/bin/sh
 # Created by Peter Halldestam 19/8/21.
 #
 # run.sh: combines configurations from a python script (GENERATE_SETTINGS) and
 #         runs DREAM simulations for each created DREAM setting.
 #
 
-DREAM_PATH="/home/peterhalldestam/DREAM/" # /path/to/DREAM/
+DREAM_PATH="/home/pethalld/DREAM/" # /path/to/DREAM/
 DREAMI_PATH="${DREAM_PATH}build/iface/dreami"
-DREAM_SETTINGS_DIR="./dream_settings/"
-DREAM_OUTPUTS_DIR="./outputs/"
+DREAM_SETTINGS_DIR="settings/"
+DREAM_OUTPUTS_DIR="outputs/"
 GENERATE_SETTINGS="generateElectricScan.py"
 VISUALIZE="visualize.py"
 
@@ -19,11 +19,11 @@ cd "${0%/*}"
 mkdir -p $DREAM_SETTINGS_DIR
 if test -z "$(ls $DREAM_SETTINGS_DIR)"
 then
-    echo "No old dream_settings files detected."
-    echo "Creating new dream_settings files from $GENERATE_SETTINGS."
+    echo "No old DREAM settings files detected."
+    echo "Creating new DREAM settings files from $GENERATE_SETTINGS."
     python3 $GENERATE_SETTINGS
 else
-    echo "Old dream_settings files detected!"
+    echo "Old DREAM settings files detected!"
     while true
     do
         read -p "Do you wish to replace them? (y/n/quit)" ans
@@ -71,7 +71,7 @@ echo ""
 
 # count DREAM settings
 n=0
-for settings_file in $DREAM_OUTPUTS_DIR*.h5
+for settings_file in $DREAM_SETTINGS_DIR*.h5
 do
     n=$((n+1))
 done
@@ -84,7 +84,7 @@ for settings_file in $DREAM_SETTINGS_DIR*.h5
 do
     i=$((i+1))
     echo "Running simulation $i/$n"
-    /.$DREAMI_PATH $settings_file
+    $DREAMI_PATH $settings_file
 done
 
 ## check DREAM outputs

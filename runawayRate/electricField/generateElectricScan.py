@@ -1,6 +1,7 @@
 #!/bin/python3
 """
-Created by Peter Halldestam 19/8/21.
+Created by Peter Halldestam 19/8/21,
+modified by Peter Halldestam 8/9/21.
 
 Generates DREAM settings files for a range of electric fields.
 """
@@ -11,38 +12,25 @@ dir = os.path.dirname(os.path.realpath(__file__))
 
 # Parameters import
 sys.path.append(os.path.join(dir, '../..'))
-import parameters as p
+from parameters import ELECTRIC_FIELD
 
 # Baseline DREAM settings import
 sys.path.append(os.path.join(dir, '..'))
-import configureDREAM as c
-
-# Settings object import
-sys.path.append(p.DREAM_PATH)
-from DREAM.DREAMSettings import DREAMSettings
+from configureDREAM import ConfigureDREAM
+from configureDREAM import CYLINDRICAL
 
 # Scan parameters
-nScanValues = 3
-scanValues = p.ELECTRIC_FIELD * np.linspace(.9, 1.2, nScanValues)
+nScanValues = 10
+scanValues = ELECTRIC_FIELD * np.linspace(.5, 3, nScanValues)
 
 
 if __name__ == "__main__":
 
-    for i, electricField in enumerate(scanValues):
+    for scanValue in scanValues:
 
-        print(i)
-        # Cylindrical geometry
-        ds1 = DREAMSettings()
-        c.configureGrids(ds1, geometry=c.CYLINDRICAL)
-        c.configureEquations(ds1, electricField=electricField)
-        ds1.output.setFilename(f'outputs/output_cyl{i}.h5')
-        ds1.other.include('fluid/runawayRate')
-        ds1.save(f'dream_settings/settings_cyl{i}.h5')
-
-        # Toroidal geometry
-        # ds2 = DREAMSettings()
-        # c.configureGrids(ds2, geometry=c.TOROIDAL)
-        # c.configureEquations(ds2, electricField=electricField)
-        # ds2.output.setFilename(F'outputs/output_tor_E={electricField:2.3}.h5')
-        # ds2.other.include('fluid/runawayRate')
-        # ds2.save(f'dream_settings/settings_tor_E={electricField:2.3}.h5')
+        ConfigureDREAM(include=['fluid/runawayRate', 'fluid/gammaDreicer'],
+                       geometry=CYLINDRICAL,
+                       electricField=scanValue,
+                       output=f'outputs/output{scanValue}.h5',
+                       save=f'settings/setting{scanValue}.h5',
+                       verbose=(len(sys.argv)==2))

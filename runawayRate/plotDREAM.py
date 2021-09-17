@@ -38,7 +38,7 @@ def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, ve
         time = do.other.fluid.runawayRate.time
 
     except AttributeError as err:
-        raise Exception(f'Output file {fp} does not include needed data.') from err
+        raise Exception('Output does not include needed data.') from err
 
     if normalize:
         runawayRate /= runawayRate[0]
@@ -52,6 +52,41 @@ def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, ve
         plt.show()
 
     return ax
+
+
+def testplot(outputDir='outputs/', ax=None, label=None, show=False):
+
+    runawayRateValues = []
+    gammaDreicerValues = []
+    electricFieldValues = []
+
+    for fp in os.listdir(outputDir):
+        if fp.endswith('.h5'):
+            do = DREAMOutput(os.path.join(outputDir, fp))
+            try:
+                runawayRateValues.append(do.other.fluid.runawayRate[-1,0])
+                gammaDreicerValues.append(do.other.fluid.gammaDreicer[-1,0])
+                electricFieldValues.append(np.mean(do.eqsys.E_field.data))
+
+            except AttributeError as err:
+                raise Exception('Output does not include needed data.') from err
+
+    if ax is None:
+        ax = plt.axes()
+
+    ax.semilogy(electricFieldValues, runawayRateValues, '.', color='red', label='total runaway rate')
+    ax.semilogy(electricFieldValues, gammaDreicerValues, '.', color='blue', label='Dreicer generation')
+
+    if show:
+        ax.grid(True, which='both')
+        ax.minorticks_on()
+        ax.legend(loc='lower right')
+        ax.set_xlabel(r'electric field $E$ [V m$^{-1}$]')
+        ax.set_ylabel(r'Runaway generation [s$^{-1}$ m$^{-3}$]')
+        plt.show()
+
+    return ax
+
 
 def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, show=False, verbose=False):
     """
@@ -70,11 +105,11 @@ def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, show=Fa
         print(plotRunawayRate.__doc__)
 
     try:
-        runawayRate = do.other.fluid.runawayRate.data[0,:]
+        runawayRate = do.other.fluid.runawayRate.data[-1,:] # at final time step
         minorRadius = do.grid.r
 
     except AttributeError as err:
-        raise Exception(f'Output file {fp} does not include .') from err
+        raise Exception(f'Output does not include needed data.') from err
 
     if normalize:
         runawayRate /= runawayRate[0]
