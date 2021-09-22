@@ -1,6 +1,7 @@
 #!/bin/python3
 """
-Created by Peter Halldestam 7/9/21.
+Created by Peter Halldestam 7/9/21,
+modified by Peter Halldestam 22/9/21.
 """
 import sys, os
 import numpy as np
@@ -104,6 +105,41 @@ def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, show=Fa
     return ax
 
 
+def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, show=False, verbose=False):
+    """
+    Plot effective passing fraction associated with a DREAM output geometry.
+    Returns Axes object.
+
+    DREAM.DREAMOutput do :      DREAM settings object.
+    matplotlib.axes.Axes ax :   Axes object used for plotting.
+    str label :                 Legend label.
+    bool show :                 Show figure.
+    bool verbose :              Show information.
+    """
+    if verbose:
+        print(plotEffectivePassingFractionMinorRadius.__doc__)
+
+    try:
+        effectivePassingFraction = do.grid.effectivePassingFraction
+        minorRadius = do.grid.r
+
+    except AttributeError as err:
+        raise Exception(f'Output does not include needed data.') from err
+
+    if normalize:
+        effectivePassingFraction /= effectivePassingFraction[0]
+
+    if ax is None:
+        ax = plt.axes()
+
+    ax.plot(minorRadius, effectivePassingFraction, label=label)
+
+    if show:
+        plt.show()
+
+    return ax
+
+
 def plotFluxSurface(kappa=None, delta=None, Delta=None, nNodes=100,
                     ax=None, label=None, show=False, verbose=False):
     """
@@ -143,33 +179,68 @@ def plotFluxSurface(kappa=None, delta=None, Delta=None, nNodes=100,
 
     return ax
 
-def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, show=False,
-                                            normalize=False, verbose=False):
+
+def plotMagneticFieldStrength(ax=None, nr=50, ntheta=50, show=False, verbose=False):
     """
-    plot
+    Plot magnetic field strength defined by the three shaping parameters kappa,
+    delta, and Delta in DREAM's analytical toroidal magnetic field model.
+    Returns Axes object.
+
+    matplotlib.axes.Axes ax :   Axes object used for plotting.
+    int nr :                    No. nodes for minor radius coordinate
+    int ntheta :                No. nodes for poloidal angle coordinate
+    bool show :                 Show figure.
+    bool verbose :              Show information.
     """
     if verbose:
-        print(plotEffectivePassingFractionMinorRadius.__doc__)
+        print(plotMagneticFieldStrength.__doc__)
 
-    try:
-        effectivePassingFraction = do.grid.effectivePassingFraction
-        minorRadius = do.grid.r
+    # define grid
+    r = np.linspace(.01, 1, nr) * p.MINOR_RADIUS
+    theta = np.linspace(0, 2 * np.pi, ntheta)
+    rGrid, thetaGrid = np.meshgrid(r, theta)
 
-    except AttributeError as err:
-        raise Exception(f'Output does not include needed data.') from err
+    # get shaping parameters
+    maxList = [p.MAX_ELONGATION, p.MAX_TRIANGULARITY, p.MAX_SHAFRANOV_SHIFT]
+    kappa, delta, Delta = [max * rGrid / p.MINOR_RADIUS for max in maxList]
+    DeltaDer = p.MAX_SHAFRANOV_SHIFT / p.MINOR_RADIUS
 
-    if normalize:
-        effectivePassingFraction /= effectivePassingFraction[0]
+    # get R,z from r, theta through coordinate transform
+    RGrid = p.MAJOR_RADIUS + Delta + rGrid * np.cos(thetaGrid + delta * np.sin(thetaGrid))
+    zGrid = rGrid * kappa * np.sin(thetaGrid)
+
+    # compute Jacobian
+    jac = np.sin(thetaGrid) * np.sin(thetaGrid + delta * np.sin(thetaGrid))
+    jac *= 1 + delta * np.cos(thetaGrid)
+    jac += np.cos(delta * np.sin(thetaGrid)) + DeltaDer * np.cos(thetaGrid)
+    jac *= kappa * rGrid * RGrid
+
+    # compute scale factor |\grad{r}|^2
+    sf = np.sin(thetaGrid + delta * np.sin(thetaGrid)) ** 2
+    sf *= (1 + delta * np.cos(thetaGrid)) ** 2
+    sf += (kappa * np.cos(thetaGrid)) ** 2
+    sf *= (kappa * rGrid * RGrid / jac) ** 2
+
+    # magnetic functions (assuming same as in /Docs/Python/frontend/DREAMSettings/radialgrid)
+    G = p.MAGNETIC_FIELD * p.MAJOR_RADIUS
+    psiDer = 2 * p.MU_0 * p.PLASMA_CURRENT * rGrid / p.MINOR_RADIUS
+
+    # finally compute the magnetic field strength
+    magneticFieldStrength = np.sqrt(G ** 2 + sf * (psiDer / (2 * np.pi)) ** 2) / RGrid
 
     if ax is None:
         ax = plt.axes()
 
-    ax.plot(minorRadius, effectivePassingFraction, label=label)
+    # ax.plot_surface(RGrid, zGrid, magneticFieldStrength, rstride=1, cstride=1,
+    #                 cmap='viridis', edgecolor='none')
+
+    ax.pcolormesh(RGrid, zGrid, magneticFieldStrength)
 
     if show:
         plt.show()
 
     return ax
+
 
 
 def testplot(outputDir='outputs/', ax=None, label=None, show=False):
@@ -208,4 +279,5 @@ def testplot(outputDir='outputs/', ax=None, label=None, show=False):
 
 
 if __name__ == '__main__':
-    plotFluxSurface(show=True, verbose=(len(sys.argv)==2))
+    # plotFluxSurface(show=True, verbose=(len(sys.argv)==2))
+    plotMagneticFieldStrength(show=True, verbose=(len(sys.argv)==2))
