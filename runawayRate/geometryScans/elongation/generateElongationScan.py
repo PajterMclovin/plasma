@@ -21,8 +21,8 @@ sys.path.append(os.path.join(dir, '../..'))
 from configureDREAM import ConfigureDREAM
 
 # Scan parameters
-nScanValues = 3
-scanValues = MAX_ELONGATION * np.linspace(.5, 2, nScanValues)
+nScanValues = 5
+scanValues = MAX_ELONGATION * np.linspace(1e-1, 1e1, nScanValues)
 
 if __name__ == "__main__":
 

@@ -188,11 +188,12 @@ class ConfigureDREAM:
         # Set boundary condition type at pMax
         ds.eqsys.f_hot.setBoundaryCondition(BC_F_0) # F=0 outside the boundary
         ds.eqsys.f_hot.setSynchrotronMode(SYNCHROTRON_MODE_NEGLECT)
-        ds.eqsys.f_hot.setAdvectionInterpolationMethod(ad_int=AD_INTERP_TCDF,
-   ad_jac=AD_INTERP_JACOBIAN_UPWIND)
+        ds.eqsys.f_hot.setAdvectionInterpolationMethod(ad_int=AD_INTERP_UPWIND)
+        # ds.eqsys.f_hot.setAdvectionInterpolationMethod(ad_int=AD_INTERP_TCDF, ad_jac=AD_INTERP_JACOBIAN_UPWIND)
 
         # Set solver type
-        ds.solver.setType(NONLINEAR) # semi-implicit time stepping
+        ds.solver.setType(LINEAR_IMPLICIT)
+        # ds.solver.setType(NONLINEAR)
         ds.solver.preconditioner.setEnabled(False)
 
 
