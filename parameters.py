@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 # make sure path to DREAM exists
-DREAM_PATH = '/home/hannber/DREAM/py'  # /path/to/DREAM/py
+DREAM_PATH = '/home/peterhalldestam/DREAM/py'  # /path/to/DREAM/py
 try:
     sys.path.append(DREAM_PATH)
     import DREAM
@@ -33,14 +33,14 @@ MAX_PITCH_STEP      = 1e-2               # max pitch step
 MAX_TIME            = 3e-2               # simulation time in seconds
 MAX_SHAFRANOV_SHIFT = 0.1 * MINOR_RADIUS # max Shafranov shift
 MAX_TRIANGULARITY   = 0.2                # max triangularity
-MAX_ELONGATION      = 0.5                # max elongation
+MAX_ELONGATION      = 1.5                # max elongation
 
 
 # Grid parameters resolution
-N_MOMENTUM        = 100 # no. momentum grid points
+N_MOMENTUM        = 40 # no. momentum grid points
 N_PITCH           = 20  # no. pitch grid points
-N_TIME            = 30  # no. time steps
-N_RADIUS          = 20  # no. radial grid points
+N_TIME            = 10  # no. time steps
+N_RADIUS          = 10  # no. radial grid points
 N_POLODIAL_FLUX   = 20  # no. poloidal flux grid points
 N_SHAFRANOV_SHIFT = 20  # no. Shafranov shift grid point
 N_TRIANGULARITY   = 20  # no. triangularity grid points
@@ -51,4 +51,3 @@ N_ELONGATION      = 20  # no. elongation grid points
 TOL_ELECTRON_DENSITY_RATIO	= 0.01	# tolerance of the ration n_re/n_cold
 TOL_RUNAWAY_RATE_CONVERGENCE	= 0.1	# tolerance for the relative convergence of runawayRate
 LIM_RUNAWAY_RATE_CONVERGENCE	= 0.8	# percentual limit from which the convergence will be tested
-
