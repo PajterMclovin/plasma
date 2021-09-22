@@ -16,6 +16,19 @@ import parameters as p
 sys.path.append(p.DREAM_PATH)
 from DREAM.DREAMOutput import DREAMOutput
 
+# set font sizes
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+# BIGGER_SIZE = 18
+plt.rc('font', size=SMALL_SIZE)          # default
+plt.rc('axes', titlesize=SMALL_SIZE)     # axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # x tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # y tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend
+
+# figure size (import this)
+FIGSIZE = (10, 5)
 
 
 def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, verbose=False):
@@ -49,40 +62,6 @@ def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, ve
     ax.semilogy(time, runawayRate, label=label)
 
     if show:
-        plt.show()
-
-    return ax
-
-
-def testplot(outputDir='outputs/', ax=None, label=None, show=False):
-
-    runawayRateValues = []
-    gammaDreicerValues = []
-    electricFieldValues = []
-
-    for fp in os.listdir(outputDir):
-        if fp.endswith('.h5'):
-            do = DREAMOutput(os.path.join(outputDir, fp))
-            try:
-                runawayRateValues.append(do.other.fluid.runawayRate[-1,0])
-                gammaDreicerValues.append(do.other.fluid.gammaDreicer[-1,0])
-                electricFieldValues.append(np.mean(do.eqsys.E_field.data))
-
-            except AttributeError as err:
-                raise Exception('Output does not include needed data.') from err
-
-    if ax is None:
-        ax = plt.axes()
-
-    ax.semilogy(electricFieldValues, runawayRateValues, '.', color='red', label='total runaway rate')
-    ax.semilogy(electricFieldValues, gammaDreicerValues, '.', color='blue', label='Dreicer generation')
-
-    if show:
-        ax.grid(True, which='both')
-        ax.minorticks_on()
-        ax.legend(loc='lower right')
-        ax.set_xlabel(r'electric field $E$ [V m$^{-1}$]')
-        ax.set_ylabel(r'Runaway generation [s$^{-1}$ m$^{-3}$]')
         plt.show()
 
     return ax
@@ -163,6 +142,70 @@ def plotFluxSurface(kappa=None, delta=None, Delta=None, nNodes=100,
         plt.show()
 
     return ax
+
+def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, show=False,
+                                            normalize=False, verbose=False):
+    """
+    plot
+    """
+    if verbose:
+        print(plotEffectivePassingFractionMinorRadius.__doc__)
+
+    try:
+        effectivePassingFraction = do.grid.effectivePassingFraction
+        minorRadius = do.grid.r
+
+    except AttributeError as err:
+        raise Exception(f'Output does not include needed data.') from err
+
+    if normalize:
+        effectivePassingFraction /= effectivePassingFraction[0]
+
+    if ax is None:
+        ax = plt.axes()
+
+    ax.plot(minorRadius, effectivePassingFraction, label=label)
+
+    if show:
+        plt.show()
+
+    return ax
+
+
+def testplot(outputDir='outputs/', ax=None, label=None, show=False):
+
+    runawayRateValues = []
+    gammaDreicerValues = []
+    electricFieldValues = []
+
+    for fp in os.listdir(outputDir):
+        if fp.endswith('.h5'):
+            do = DREAMOutput(os.path.join(outputDir, fp))
+            try:
+                print(do.other.fluid.runawayRate.data)
+                runawayRateValues.append(do.other.fluid.runawayRate.data[-1,0])
+                gammaDreicerValues.append(do.other.fluid.gammaDreicer.data[-1,0])
+                electricFieldValues.append(np.mean(do.eqsys.E_field.data))
+
+            except AttributeError as err:
+                raise Exception('Output does not include needed data.') from err
+
+    if ax is None:
+        ax = plt.axes()
+
+    ax.semilogy(electricFieldValues, runawayRateValues, '.', color='red', label='total runaway rate')
+    ax.semilogy(electricFieldValues, gammaDreicerValues, '.', color='blue', label='Dreicer generation')
+
+    if show:
+        ax.grid(True, which='both')
+        ax.minorticks_on()
+        ax.legend(loc='lower right')
+        ax.set_xlabel(r'electric field $E$ [V m$^{-1}$]')
+        ax.set_ylabel(r'Runaway generation [s$^{-1}$ m$^{-3}$]')
+        plt.show()
+
+    return ax
+
 
 if __name__ == '__main__':
     plotFluxSurface(show=True, verbose=(len(sys.argv)==2))
