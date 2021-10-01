@@ -26,8 +26,10 @@ from DREAM.Settings.Equations.DistributionFunction import AD_INTERP_UPWIND, AD_I
 from DREAM.Settings.Solver import LINEAR_IMPLICIT, NONLINEAR
 
 # Geometries
-CYLINDRICAL = 1
-TOROIDAL = 2
+import DREAM.Settings.RadialGrid.TYPE_CYLINDRICAL as CYLINDRICAL
+import DREAM.Settings.RadialGrid.TYPE_ANALYTIC_TOROIDAL as TOROIDAL
+# import DREAM.Settings.RadialGrid.TYPE_NUMERICAL as NUMERICAL # not in use
+
 
 class ConfigureDREAM:
 
