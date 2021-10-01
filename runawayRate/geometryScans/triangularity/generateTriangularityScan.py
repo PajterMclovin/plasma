@@ -22,7 +22,7 @@ from configureDREAM import ConfigureDREAM
 
 # Scan parameters
 nScanValues = 5
-scanValues = np.linspace(-1, 1, nScanValues)
+scanValues = np.linspace(-1, 1, nScanValues) #* MAX_TRIANGULARITY
 
 if __name__ == "__main__":
 

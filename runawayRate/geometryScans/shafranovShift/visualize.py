@@ -14,6 +14,8 @@ dir = os.path.dirname(os.path.realpath(__file__))
 
 # plot helper function import
 sys.path.append(os.path.join(dir, '../..'))
+from plotDREAM import FIGSIZE
+from plotDREAM import plotEffectivePassingFractionMinorRadius
 from plotDREAM import plotRunawayRateMinorRadius
 from plotDREAM import plotFluxSurface
 
@@ -26,8 +28,8 @@ from DREAM.DREAMOutput import DREAMOutput
 sys.path.append(os.path.join(dir, 'outputs'))
 outputDir = os.path.join(dir, 'outputs')
 
-
-fig, (ax1, ax2) = plt.subplots(1,2)
+# initialize figure and 1x2 axes
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=FIGSIZE)
 
 # visualize specified output
 if len(sys.argv) == 2:
@@ -36,14 +38,18 @@ if len(sys.argv) == 2:
 
 # visualize all outputs
 elif len(sys.argv) == 1:
-    for fp in os.listdir(outputDir):
-        if fp.endswith(".h5"):
+
+    # sort by increasing Shafranov shift
+    for fp in sorted(os.listdir(outputDir), key=lambda x: float(x[len('output'):-3])):
+
+        # load output and plot
+        if fp.startswith('output') and fp.endswith('.h5'):
+            Delta = float(fp[len('output'):-len('.h5')])    # extract Shafranov shift
             outputFile = os.path.join(outputDir, fp)
             do = DREAMOutput(outputFile)
-            maxShafranovShift = fp[len('output'):-3]
-            label = f'{maxShafranovShift:.6}'
-            ax1 = plotRunawayRateMinorRadius(do, ax=ax1, label=label)
-            ax2 = plotFluxSurface(Delta=float(maxShafranovShift), ax=ax2, label=label)
+            # ax1 = plotRunawayRateMinorRadius(do, ax=ax1, label=f'{Delta:4.5}')
+            ax1 = plotEffectivePassingFractionMinorRadius(do, ax=ax1, label=f'{Delta:4.5}')
+            ax2 = plotFluxSurface(Delta=Delta, ax=ax2, label=f'{Delta:4.5}')
 
 else:
     raise ValueError('Expected at most one argument.')
