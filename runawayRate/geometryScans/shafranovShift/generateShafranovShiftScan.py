@@ -14,7 +14,7 @@ dir = os.path.dirname(os.path.realpath(__file__))
 
 # Parameters import
 sys.path.append(os.path.join(dir, '../../..'))
-from parameters import MAX_SHAFRANOV_SHIFT
+from parameters import MAX_SHAFRANOV_SHIFT, MAJOR_RADIUS
 
 # helper function import
 sys.path.append(os.path.join(dir, '../..'))
@@ -22,7 +22,7 @@ from configureDREAM import ConfigureDREAM
 
 # Scan parameters
 nScanValues = 3
-scanValues = MAX_SHAFRANOV_SHIFT * np.linspace(.9, 1.1, nScanValues)
+scanValues = np.linspace(-.2, .2, nScanValues) * MAJOR_RADIUS
 
 if __name__ == "__main__":
 

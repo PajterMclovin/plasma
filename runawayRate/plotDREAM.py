@@ -126,13 +126,10 @@ def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, show=False,
     except AttributeError as err:
         raise Exception(f'Output does not include needed data.') from err
 
-    if normalize:
-        effectivePassingFraction /= effectivePassingFraction[0]
-
     if ax is None:
         ax = plt.axes()
 
-    ax.plot(minorRadius, effectivePassingFraction, label=label)
+    plt.plot(minorRadius, effectivePassingFraction, label=label)
 
     if show:
         plt.show()
@@ -140,18 +137,20 @@ def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, show=False,
     return ax
 
 
-def plotFluxSurface(kappa=None, delta=None, Delta=None, nNodes=100,
-                    ax=None, label=None, show=False, verbose=False):
+def plotFluxSurface(r=None, kappa=None, delta=None, Delta=None, nNodes=100,
+                    ax=None, fmt=None, label=None, show=False, verbose=False):
     """
     Plot magnetic flux surface defined by the three shaping parameters kappa,
     delta, and Delta in DREAM's analytical toroidal magnetic field model.
     Returns Axes object.
 
+    float r :                   Minor radius coordinate.
     float kappa :               Elongation paramater
     float delta :               Triangularity paramater
     float Delta :               Shafranov shift paramater
     int nNodes :                No. nodes to plot the closed curve (xz-plane) with.
     matplotlib.axes.Axes ax :   Axes object used for plotting.
+    str fmt :                   Configure line appearence (see matplotlib.pyplot.plot).
     str label :                 Legend label.
     bool show :                 Show figure.
     bool verbose :              Show information.
@@ -165,14 +164,22 @@ def plotFluxSurface(kappa=None, delta=None, Delta=None, nNodes=100,
     delta = p.MAX_TRIANGULARITY if delta is None else delta
     Delta = p.MAX_SHAFRANOV_SHIFT if Delta is None else Delta
 
-    theta = np.linspace(0, 2*np.pi, nNodes) # poloidal angles
-    x = p.MAJOR_RADIUS + Delta + p.MINOR_RADIUS * np.cos(theta + delta * np.sin(theta))
-    z = p.MINOR_RADIUS * kappa * np.sin(theta)
+    get = lambda max, r: max * r / p.MINOR_RADIUS
 
-    if ax is None:
-        ax = plt.axes()
+    r = p.MINOR_RADIUS if r is None else r
+    theta = np.linspace(0, 2 * np.pi, nNodes) # poloidal angles
 
-    ax.plot(x, z, label=label)
+
+    print('f')
+    print(get(Delta, p.MINOR_RADIUS))
+
+    x = p.MAJOR_RADIUS + get(Delta, r) + r * np.cos(theta + get(delta, r) * np.sin(theta))
+    z = r * get(kappa, r) * np.sin(theta)
+
+    ax = plt.axes() if ax is None else ax
+
+    fmt = 'k-' if fmt is None else fmt
+    plt.plot(x, z, f'{fmt}', label=label)
 
     if show:
         plt.show()
@@ -196,7 +203,7 @@ def plotMagneticFieldStrength(ax=None, nr=50, ntheta=50, show=False, verbose=Fal
         print(plotMagneticFieldStrength.__doc__)
 
     # define grid
-    r = np.linspace(.01, 1, nr) * p.MINOR_RADIUS
+    r = np.linspace(.01, 1.5, nr) * p.MINOR_RADIUS
     theta = np.linspace(0, 2 * np.pi, ntheta)
     rGrid, thetaGrid = np.meshgrid(r, theta)
 
@@ -279,5 +286,27 @@ def testplot(outputDir='outputs/', ax=None, label=None, show=False):
 
 
 if __name__ == '__main__':
-    # plotFluxSurface(show=True, verbose=(len(sys.argv)==2))
-    plotMagneticFieldStrength(show=True, verbose=(len(sys.argv)==2))
+
+    Delta = .5*p.MINOR_RADIUS
+
+    ax = plotFluxSurface(Delta=Delta, verbose=(len(sys.argv)==2))
+    n = 10
+    for i in range(n):
+        plotFluxSurface(fmt='grey', Delta=Delta, ax=ax, r=p.MINOR_RADIUS * i / n, verbose=(len(sys.argv)==2))
+
+    ax = plotFluxSurface(Delta=-Delta, ax=ax, verbose=(len(sys.argv)==2))
+    n = 10
+    for i in range(n):
+        plotFluxSurface(fmt='grey', Delta=-Delta, ax=ax, r=p.MINOR_RADIUS * i / n, verbose=(len(sys.argv)==2))
+
+    plotMagneticFieldStrength(ax=ax)
+
+    # plotFluxSurface(fmt='grey', ax=ax, Delta=Delta, r=p.MINOR_RADIUS * .01, verbose=(len(sys.argv)==2))
+    # plotFluxSurface(fmt='grey', ax=ax, Delta=Delta,r=p.MINOR_RADIUS * .02, verbose=(len(sys.argv)==2))
+    # plotFluxSurface(fmt='grey', ax=ax, Delta=Delta,r=p.MINOR_RADIUS * .03, verbose=(len(sys.argv)==2))
+    # plotFluxSurface(fmt='grey', ax=ax, Delta=Delta,r=p.MINOR_RADIUS * .04, verbose=(len(sys.argv)==2))
+
+    plt.show()
+
+
+    # plotMagneticFieldStrength(show=True, verbose=(len(sys.argv)==2))
