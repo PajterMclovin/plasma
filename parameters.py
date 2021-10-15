@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 # make sure path to DREAM exists
-DREAM_PATH = '/home/peterhalldestam/DREAM/py'  # /path/to/DREAM/py
+DREAM_PATH = '/home/hannber/DREAM/py'  # /path/to/DREAM/py
 try:
     sys.path.append(DREAM_PATH)
     import DREAM
@@ -17,6 +17,7 @@ ELECTRON_DENSITY = 5e19 # [m^-3]
 ELECTRIC_FIELD = 1.0   # [V/m]
 TEMPERATURE = 100   # [eV]
 
+m_e = 510999           # Electron mass [eV/c^2]
 MU_0 = 4e-7 * np.pi    # Permeability of free space
 
 PLASMA_CURRENT = 200e3  # Reference plasma current which generates poloidal field
@@ -28,7 +29,7 @@ WALL_RADIUS = 1.2 * MINOR_RADIUS
 MAGNETIC_FIELD = 5e0  # on-axis magnetic field strength
 
 # Grid parameter maxima
-MAX_MOMENTUM        = 1e0                # max momentum in units of m_e*c
+MAX_MOMENTUM        = 1e1                # max momentum in units of m_e*c
 MAX_PITCH_STEP      = 1e-2               # max pitch step
 MAX_TIME            = 3e-2               # simulation time in seconds
 MAX_SHAFRANOV_SHIFT = 0.1 * MINOR_RADIUS # max Shafranov shift
@@ -37,15 +38,20 @@ MAX_ELONGATION      = 1.5                # max elongation
 
 
 # Grid parameters resolution
-N_MOMENTUM        = 40 # no. momentum grid points
+N_MOMENTUM        = 200 # no. momentum grid points
 N_PITCH           = 20  # no. pitch grid points
-N_TIME            = 10  # no. time steps
-N_RADIUS          = 10  # no. radial grid points
+N_TIME            = 15  # no. time steps
+N_RADIUS          = 8  # no. radial grid points
 N_POLODIAL_FLUX   = 20  # no. poloidal flux grid points
 N_SHAFRANOV_SHIFT = 20  # no. Shafranov shift grid point
 N_TRIANGULARITY   = 20  # no. triangularity grid points
 N_ELONGATION      = 20  # no. elongation grid points
 
+# Avalanche parameters including definition of biuniform grid
+P_th            = np.sqrt(3 * TEMPERATURE / m_e)
+P_CUT_AVALANCHE = 0.01                   # minimum momentum to which the Avalanche source term is applied in units of m_e*c
+PSEP            = 7 * P_th     # max momentum of the lower grid in units of m_e*c
+N_PSEP          = int(N_MOMENTUM + P_th - MAX_MOMENTUM) # no. grid points in the lower grid
 
 # check output parameters
 TOL_ELECTRON_DENSITY_RATIO	= 0.01	# tolerance of the ration n_re/n_cold
