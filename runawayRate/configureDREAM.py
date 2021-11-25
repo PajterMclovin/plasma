@@ -4,6 +4,7 @@ Created by Peter Halldestam 19/8/21,
 modified by Hannes Bergström 26/8/21,
 modified by Peter Halldestam 4/9/21,
 modified by Hannes Bergström 8/9/21.
+modified by Hannes Bergström 25/11/21.
 """
 import sys, os
 import numpy as np
@@ -26,8 +27,8 @@ from DREAM.Settings.Equations.DistributionFunction import AD_INTERP_UPWIND, AD_I
 from DREAM.Settings.Solver import LINEAR_IMPLICIT, NONLINEAR
 
 # Geometries
-import DREAM.Settings.RadialGrid.TYPE_CYLINDRICAL as CYLINDRICAL
-import DREAM.Settings.RadialGrid.TYPE_ANALYTIC_TOROIDAL as TOROIDAL
+from DREAM.Settings.RadialGrid import TYPE_CYLINDRICAL as CYLINDRICAL
+from DREAM.Settings.RadialGrid import TYPE_ANALYTIC_TOROIDAL as TOROIDAL
 # import DREAM.Settings.RadialGrid.TYPE_NUMERICAL as NUMERICAL # not in use
 
 
@@ -45,18 +46,25 @@ class ConfigureDREAM:
             DREAMSettings ds :          Settings object.
             str include :               Or list of strings, other quantities to include.
             int geometry :              Geometry type.
+            float minorRadius :         Prescribed minor radius of the magnetic field.
+            float majorRadius :         Prescribed major radius of the magnetic field.
+            float wallRadius :          Prescribed wall radius of the device.
             float electricField :       Prescribed electric field strength.
             float temperature :         Prescribed temperature.
             float maxElongation :       Shaping parameter.
             float maxTriangularity :    Shaping parameter.
             float maxShafranovShift :   Shaping parameter.
             tuple ion :                 Name and proton number pair describing the type of ion used in the plasma.
+            bool avalanche :            If True, configures avalanche generation and appropriate biuniform grid.
 
         """
         self.verbose            = kwargs.get('verbose',             False)
         self.ds                 = kwargs.get('ds',                  None)
         self.include            = kwargs.get('include',             None)
         self.geometry           = kwargs.get('geometry',            TOROIDAL)
+        self.minorRadius        = kwargs.get('minorRadius',         p.MINOR_RADIUS)
+        self.majorRadius        = kwargs.get('majorRadius',         p.MAJOR_RADIUS)
+        self.wallRadius         = kwargs.get('wallRadius',          p.WALL_RADIUS)
         self.electricField      = kwargs.get('electricField',       p.ELECTRIC_FIELD)
         self.temperature        = kwargs.get('temperature',         p.TEMPERATURE)
         self.maxElongation      = kwargs.get('maxElongation',       p.MAX_ELONGATION)
@@ -106,19 +114,19 @@ class ConfigureDREAM:
         Delta = np.linspace(0, self.maxShafranovShift, p.N_SHAFRANOV_SHIFT)
 
         # Set up input radial grids
-        rkappa = np.linspace(0, p.MINOR_RADIUS, p.N_ELONGATION)
-        rdelta = np.linspace(0, p.MINOR_RADIUS, p.N_TRIANGULARITY)
-        rDelta = np.linspace(0, p.MINOR_RADIUS, p.N_SHAFRANOV_SHIFT)
+        rkappa = np.linspace(0, self.minorRadius, p.N_ELONGATION)
+        rdelta = np.linspace(0, self.minorRadius, p.N_TRIANGULARITY)
+        rDelta = np.linspace(0, self.minorRadius, p.N_SHAFRANOV_SHIFT)
 
         # Toroidal field function
         GOverR0 = p.MAGNETIC_FIELD     # = R*Bphi/R0
 
         # Poloidal flux
-        rpsi = np.linspace(0, p.MINOR_RADIUS, p.N_POLODIAL_FLUX)
-        psi = -p.MU_0 * p.PLASMA_CURRENT * (1-(rpsi / p.MINOR_RADIUS)**2) * p.MINOR_RADIUS
+        rpsi = np.linspace(0, self.minorRadius, p.N_POLODIAL_FLUX)
+        psi = -p.MU_0 * p.PLASMA_CURRENT * (1-(rpsi / self.minorRadius)**2) * self.minorRadius
 
         # set radial grid shape
-        ds.radialgrid.setMajorRadius(p.MAJOR_RADIUS)
+        ds.radialgrid.setMajorRadius(self.majorRadius)
         ds.radialgrid.setShaping(psi=psi, rpsi=rpsi, GOverR0=GOverR0,
                                  kappa=kappa, rkappa=rkappa,
                                  Delta=Delta, rDelta=rDelta,
@@ -151,8 +159,8 @@ class ConfigureDREAM:
             raise ValueError("Invalid geometry input!")
 
         # general radial grid settings
-        ds.radialgrid.setWallRadius(p.WALL_RADIUS)
-        ds.radialgrid.setMinorRadius(p.MINOR_RADIUS)
+        ds.radialgrid.setWallRadius(self.wallRadius)
+        ds.radialgrid.setMinorRadius(self.minorRadius)
         ds.radialgrid.setNr(p.N_RADIUS)
 
         # hot-tail grid settings
