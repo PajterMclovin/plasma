@@ -24,7 +24,7 @@ from DREAM.Settings.Equations.RunawayElectrons import AVALANCHE_MODE_NEGLECT, AV
 from DREAM.Settings.Equations.DistributionFunction import BC_F_0
 from DREAM.Settings.Equations.DistributionFunction import SYNCHROTRON_MODE_NEGLECT
 from DREAM.Settings.Equations.DistributionFunction import AD_INTERP_UPWIND, AD_INTERP_TCDF, AD_INTERP_JACOBIAN_UPWIND
-from DREAM.Settings.Solver import LINEAR_IMPLICIT, NONLINEAR
+from DREAM.Settings.Solver import LINEAR_IMPLICIT, NONLINEAR, LINEAR_SOLVER_MKL
 
 # Geometries
 from DREAM.Settings.RadialGrid import TYPE_CYLINDRICAL as CYLINDRICAL
@@ -163,19 +163,27 @@ class ConfigureDREAM:
         ds.radialgrid.setMinorRadius(self.minorRadius)
         ds.radialgrid.setNr(p.N_RADIUS)
 
-        # hot-tail grid settings
-        ds.hottailgrid.setNxi(p.N_PITCH)
-        ds.hottailgrid.setNp(p.N_MOMENTUM)
-        ds.hottailgrid.setPmax(p.MAX_MOMENTUM)
+        # hot-tail and runaway grid settings
         if self.avalanche:
-            ds.hottailgrid.setBiuniformGrid(psep=p.PSEP, npsep=p.N_PSEP)
+            ds.hottailgrid.setNxi(p.N_PITCH)
+            ds.hottailgrid.setNp(p.N_PSEP)
+            ds.hottailgrid.setPmax(p.PSEP)
+            
+            ds.runawaygrid.setEnabled(True)
+            ds.runawaygrid.setNxi(p.N_PITCH)
+            ds.runawaygrid.setNp(p.N_MOMENTUM-p.N_PSEP)
+            ds.runawaygrid.setPmax(p.MAX_MOMENTUM)
+            
+        else:
+            ds.hottailgrid.setNxi(p.N_PITCH)
+            ds.hottailgrid.setNp(p.N_MOMENTUM)
+            ds.hottailgrid.setPmax(p.MAX_MOMENTUM)
+            
+            ds.runawaygrid.setEnabled(False)
 
         # time grid settings
         ds.timestep.setTmax(p.MAX_TIME)
         ds.timestep.setNt(p.N_TIME)
-
-        # disable runaway grid
-        ds.runawaygrid.setEnabled(False)
 
 
     def configureEquations(self):
@@ -200,9 +208,16 @@ class ConfigureDREAM:
 
         # Configure avalanche generation
         if self.avalanche:
-            ds.eqsys.n_re.setAvalanche(avalanche=AVALANCHE_MODE_KINETIC, pCutAvalanche=p.P_CUT_AVALANCHE)
+            ds.eqsys.n_re.setAvalanche(avalanche=AVALANCHE_MODE_KINETIC, pCutAvalanche=p.P_CUT_AVALANCHE)  
+              
+            # sets nonlinear solver and adds advection interpolation
+            ds.solver.setType(NONLINEAR)
+            ds.solver.setLinearSolver(LINEAR_SOLVER_MKL)
+            ds.eqsys.f_re.setAdvectionInterpolationMethod(ad_int=AD_INTERP_TCDF, ad_jac=AD_INTERP_JACOBIAN_UPWIND)
+            
         else:
             ds.eqsys.n_re.setAvalanche(avalanche=AVALANCHE_MODE_NEGLECT)
+            ds.solver.setType(LINEAR_IMPLICIT)
 
         # Set boundary condition type at pMax
         ds.eqsys.f_hot.setBoundaryCondition(BC_F_0) # F=0 outside the boundary
@@ -211,8 +226,6 @@ class ConfigureDREAM:
         # ds.eqsys.f_hot.setAdvectionInterpolationMethod(ad_int=AD_INTERP_TCDF, ad_jac=AD_INTERP_JACOBIAN_UPWIND)
 
         # Set solver type
-        ds.solver.setType(LINEAR_IMPLICIT)
-        # ds.solver.setType(NONLINEAR)
         ds.solver.preconditioner.setEnabled(False)
 
 

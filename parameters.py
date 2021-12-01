@@ -38,10 +38,10 @@ MAX_ELONGATION      = 1.5                # max elongation
 
 
 # Grid parameters resolution
-N_MOMENTUM        = 200 # no. momentum grid points
+N_MOMENTUM        = 250 # no. momentum grid points
 N_PITCH           = 20  # no. pitch grid points
-N_TIME            = 100  # no. time steps
-N_RADIUS          = 5   # no. radial grid points
+N_TIME            = 400 # no. time steps
+N_RADIUS          = 5  # no. radial grid points
 N_POLODIAL_FLUX   = 20  # no. poloidal flux grid points
 N_SHAFRANOV_SHIFT = 20  # no. Shafranov shift grid point
 N_TRIANGULARITY   = 20  # no. triangularity grid points
