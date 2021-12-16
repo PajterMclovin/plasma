@@ -31,6 +31,41 @@ plt.rc('legend', fontsize=SMALL_SIZE)    # legend
 # figure size (import this)
 FIGSIZE = (10, 5)
 
+def plotAvalancheMultiplicationFactor(do, ax=None, label=None, normalize=False, show=False, verbose=False):
+    """
+    Plot avalanche multiplication factor Gamma vs. minor radius. Returns Axes object.
+
+    DREAM.DREAMOutput do :      DREAM settings object.
+    matplotlib.axes.Axes ax :   Axes object used for plotting.
+    str label :                 Legend label.
+    bool normalize :            Normalize such that the first element of
+                                GammaAva is equal to unity.
+    bool show :                 Show figure.
+    bool verbose :              Show information.
+
+    """
+    if verbose:
+        print(plotAvalancheMultiplicationFactor.__doc__)
+
+    try:
+        GammaAva = do.other.fluid.GammaAva.data[-1,:]
+        minorRadius = do.grid.r
+    except AttributeError as err:
+        raise Exception('Output does not include needed data.') from err
+
+    if normalize:
+        GammaAva /= GammaAva[0]
+
+    if ax is None:
+        ax = plt.axes()
+
+    ax.plot(minorRadius, GammaAva, label=label)
+
+    if show:
+        plt.show()
+
+    return ax
+
 
 def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, verbose=False):
     """

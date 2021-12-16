@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 """
 Created by Peter Halldestam 19/8/21,
 modified by Hannes Bergström 26/8/21,
@@ -20,17 +20,22 @@ import parameters as p
 sys.path.append(p.DREAM_PATH)
 from DREAM.DREAMSettings import DREAMSettings
 from DREAM.Settings.Equations.IonSpecies import IONS_PRESCRIBED_FULLY_IONIZED
-from DREAM.Settings.Equations.RunawayElectrons import AVALANCHE_MODE_NEGLECT, AVALANCHE_MODE_KINETIC
 from DREAM.Settings.Equations.DistributionFunction import BC_F_0
 from DREAM.Settings.Equations.DistributionFunction import SYNCHROTRON_MODE_NEGLECT
 from DREAM.Settings.Equations.DistributionFunction import AD_INTERP_UPWIND, AD_INTERP_TCDF, AD_INTERP_JACOBIAN_UPWIND
 from DREAM.Settings.Solver import LINEAR_IMPLICIT, NONLINEAR, LINEAR_SOLVER_MKL
 
 # Geometries
-from DREAM.Settings.RadialGrid import TYPE_CYLINDRICAL as CYLINDRICAL
-from DREAM.Settings.RadialGrid import TYPE_ANALYTIC_TOROIDAL as TOROIDAL
-# import DREAM.Settings.RadialGrid.TYPE_NUMERICAL as NUMERICAL # not in use
+CYLINDRICAL = 1
+TOROIDAL = 2
+#NUMERICAL = 3
 
+# Avalanche runaway settings
+AVALANCHE_NEGLECT   = 1
+AVALANCHE_FLUID     = 2
+AVALANCHE_KINETIC   = 4
+AVALANCHE_TRAPPING_NEGLECT = 1
+AVALANCHE_TRAPPING_INCLUDE = 2
 
 class ConfigureDREAM:
 
@@ -71,7 +76,8 @@ class ConfigureDREAM:
         self.maxTriangularity   = kwargs.get('maxTriangularity',    p.MAX_TRIANGULARITY)
         self.maxShafranovShift  = kwargs.get('maxShafranovShift',   p.MAX_SHAFRANOV_SHIFT)
         self.ion                = kwargs.get('ion',                 ('D', 1))
-        self.avalanche          = kwargs.get('avalanche',           False)
+        self.avalanche          = kwargs.get('avalanche',           AVALANCHE_NEGLECT)
+        self.avaTrapping        = kwargs.get('avaTrapping',         AVALANCHE_TRAPPING_NEGLECT)
 
         # Create and configure DREAM settings
         if self.ds is None:
@@ -164,22 +170,21 @@ class ConfigureDREAM:
         ds.radialgrid.setNr(p.N_RADIUS)
 
         # hot-tail and runaway grid settings
-        if self.avalanche:
+        if self.avalanche == AVALANCHE_KINETIC:
             ds.hottailgrid.setNxi(p.N_PITCH)
             ds.hottailgrid.setNp(p.N_PSEP)
             ds.hottailgrid.setPmax(p.PSEP)
-            
             ds.runawaygrid.setEnabled(True)
             ds.runawaygrid.setNxi(p.N_PITCH)
             ds.runawaygrid.setNp(p.N_MOMENTUM-p.N_PSEP)
             ds.runawaygrid.setPmax(p.MAX_MOMENTUM)
-            
         else:
-            ds.hottailgrid.setNxi(p.N_PITCH)
-            ds.hottailgrid.setNp(p.N_MOMENTUM)
-            ds.hottailgrid.setPmax(p.MAX_MOMENTUM)
-            
+#            ds.hottailgrid.setNxi(p.N_PITCH)
+#            ds.hottailgrid.setNp(p.N_MOMENTUM)
+#            ds.hottailgrid.setPmax(p.MAX_MOMENTUM)
+            ds.hottailgrid.setEnabled(False)
             ds.runawaygrid.setEnabled(False)
+
 
         # time grid settings
         ds.timestep.setTmax(p.MAX_TIME)
@@ -207,17 +212,19 @@ class ConfigureDREAM:
                             iontype=IONS_PRESCRIBED_FULLY_IONIZED)
 
         # Configure avalanche generation
-        if self.avalanche:
-            ds.eqsys.n_re.setAvalanche(avalanche=AVALANCHE_MODE_KINETIC, pCutAvalanche=p.P_CUT_AVALANCHE)  
-              
-            # sets nonlinear solver and adds advection interpolation
+        if self.avalanche == AVALANCHE_KINETIC:
+            pCut = p.P_CUT_AVALANCHE
             ds.solver.setType(NONLINEAR)
             ds.solver.setLinearSolver(LINEAR_SOLVER_MKL)
             ds.eqsys.f_re.setAdvectionInterpolationMethod(ad_int=AD_INTERP_TCDF, ad_jac=AD_INTERP_JACOBIAN_UPWIND)
-            
         else:
-            ds.eqsys.n_re.setAvalanche(avalanche=AVALANCHE_MODE_NEGLECT)
+            pCut = 0
             ds.solver.setType(LINEAR_IMPLICIT)
+
+        ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut)
+#        ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut,
+#                                   avaTrapping=self.avaTrapping)
+
 
         # Set boundary condition type at pMax
         ds.eqsys.f_hot.setBoundaryCondition(BC_F_0) # F=0 outside the boundary
