@@ -31,6 +31,7 @@ plt.rc('legend', fontsize=SMALL_SIZE)    # legend
 # figure size (import this)
 FIGSIZE = (10, 5)
 
+
 def plotAvalancheMultiplicationFactor(do, ax=None, label=None, normalize=False, show=False, verbose=False):
     """
     Plot avalanche multiplication factor Gamma vs. minor radius. Returns Axes object.
@@ -49,7 +50,7 @@ def plotAvalancheMultiplicationFactor(do, ax=None, label=None, normalize=False, 
 
     try:
         GammaAva = do.other.fluid.GammaAva.data[-1,:]
-        minorRadius = do.grid.r
+        epsilon = do.grid.r / p.MAJOR_RADIUS
     except AttributeError as err:
         raise Exception('Output does not include needed data.') from err
 
@@ -59,7 +60,8 @@ def plotAvalancheMultiplicationFactor(do, ax=None, label=None, normalize=False, 
     if ax is None:
         ax = plt.axes()
 
-    ax.plot(minorRadius, GammaAva, label=label)
+
+    ax.plot(epsilon, GammaAva, label=label)
 
     if show:
         plt.show()

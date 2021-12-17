@@ -24,7 +24,7 @@ from DREAM.Settings.Equations.DistributionFunction import BC_F_0
 from DREAM.Settings.Equations.DistributionFunction import SYNCHROTRON_MODE_NEGLECT
 from DREAM.Settings.Equations.DistributionFunction import AD_INTERP_UPWIND, AD_INTERP_TCDF, AD_INTERP_JACOBIAN_UPWIND
 from DREAM.Settings.Solver import LINEAR_IMPLICIT, NONLINEAR, LINEAR_SOLVER_MKL
-
+from DREAM.Settings.Equations.RunawayElectrons import DREICER_RATE_NEURAL_NETWORK
 # Geometries
 CYLINDRICAL = 1
 TOROIDAL = 2
@@ -79,7 +79,7 @@ class ConfigureDREAM:
         self.avalanche          = kwargs.get('avalanche',           AVALANCHE_NEGLECT)
         self.avaTrapping        = kwargs.get('avaTrapping',         AVALANCHE_TRAPPING_NEGLECT)
 
-        # Create and configure DREAM settings
+        # Creattope and configure DREAM settings
         if self.ds is None:
             self.ds = DREAMSettings()
             self.configureGrids()
@@ -179,10 +179,17 @@ class ConfigureDREAM:
             ds.runawaygrid.setNp(p.N_MOMENTUM-p.N_PSEP)
             ds.runawaygrid.setPmax(p.MAX_MOMENTUM)
         else:
+
 #            ds.hottailgrid.setNxi(p.N_PITCH)
 #            ds.hottailgrid.setNp(p.N_MOMENTUM)
 #            ds.hottailgrid.setPmax(p.MAX_MOMENTUM)
+
+
             ds.hottailgrid.setEnabled(False)
+            # ds.runawaygrid.setEnabled(True)
+            # ds.runawaygrid.setNxi(p.N_PITCH)
+            # ds.runawaygrid.setNp(p.N_MOMENTUM)
+            # ds.runawaygrid.setPmax(p.MAX_MOMENTUM)
             ds.runawaygrid.setEnabled(False)
 
 
@@ -211,6 +218,8 @@ class ConfigureDREAM:
         ds.eqsys.n_i.addIon(name=self.ion[0], Z=self.ion[1], n=p.ELECTRON_DENSITY/self.ion[1],
                             iontype=IONS_PRESCRIBED_FULLY_IONIZED)
 
+        ds.eqsys.n_re.setDreicer(DREICER_RATE_NEURAL_NETWORK)
+
         # Configure avalanche generation
         if self.avalanche == AVALANCHE_KINETIC:
             pCut = p.P_CUT_AVALANCHE
@@ -221,9 +230,8 @@ class ConfigureDREAM:
             pCut = 0
             ds.solver.setType(LINEAR_IMPLICIT)
 
-        ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut)
-#        ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut,
-#                                   avaTrapping=self.avaTrapping)
+        # ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut)
+        ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut, avaTrapping=self.avaTrapping)
 
 
         # Set boundary condition type at pMax

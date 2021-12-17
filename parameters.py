@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 # make sure path to DREAM exists
-DREAM_PATH = '/home/hannber/DREAM/py'  # /path/to/DREAM/py
+DREAM_PATH = '/home/peterhalldestam/DREAM/py'  # /path/to/DREAM/py
 try:
     sys.path.append(DREAM_PATH)
     import DREAM
@@ -38,10 +38,10 @@ MAX_ELONGATION      = 1.5                # max elongation
 
 
 # Grid parameters resolution
-N_MOMENTUM        = 250 # no. momentum grid points
-N_PITCH           = 20  # no. pitch grid points
-N_TIME            = 400 # no. time steps
-N_RADIUS          = 5  # no. radial grid points
+N_MOMENTUM        = 150 # no. momentum grid points
+N_PITCH           = 50   # no. pitch grid points
+N_TIME            = 20 # no. time steps
+N_RADIUS          = 20   # no. radial grid points
 N_POLODIAL_FLUX   = 20  # no. poloidal flux grid points
 N_SHAFRANOV_SHIFT = 20  # no. Shafranov shift grid point
 N_TRIANGULARITY   = 20  # no. triangularity grid points
