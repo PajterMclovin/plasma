@@ -23,7 +23,7 @@
 \usepackage{braket}
 \usepackage{pdfpages}
 \usepackage{tcolorbox}
-
+\usepackage{url}
 \usepackage{svg}
 \usepackage{physics}
 % \usepackage{tikz}
@@ -46,7 +46,7 @@
 \newcommand{\ddxx}[2]{\ensuremath{ \frac{\partial^2}{\partial #1 \partial #2} }}
 %\newcommand{\sup}[1]{\ensuremath{^{\text{#1}}}}
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
-\renewcommand{\vec}[1]{\boldsymbol{\mathbf{#1}}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
 \renewcommand{\b}[1]{\ensuremath{ {\bf #1 } }}
 \renewcommand{\arraystretch}{1.5}
 
@@ -58,16 +58,19 @@
 
 \maketitle
 
-\abstract{\noindent In a tokamak plasma, \textit{runaway electrons} are created when the force from the toroidal electric field is greater than the drag force due to Coulomb collisions.
+\abstract{\noindent In a tokamak plasma, \textit{runaway electrons} (RE) are created when the force from the toroidal electric field is greater than the drag force due to Coulomb collisions.
 This results in an acceleration of electrons to extremely high velocities which in turn may damage components of the fusion reactor facing the plasma.
-In this report we consider the cross sectional shape of the magnetic field and study its effect on runaway generation using \textsc{DREAM} (\textit{Disruption and Runaway Electron Avoidance Model}, a numerical tool primarily designed for studying the evolution of runaway electrons in tokamak disruptions \cite{DREAM}).}
+In this report we consider the cross sectional shape of the magnetic field and study its effect on RE generation using the newly developed \textsc{DREAM} \cite{DREAM}.}
 
 \section{Parametrisation of the toroidal magnetic field}
-In \textsc{DREAM}, the shape of the magnetic field is characterised by the elongation $\kappa(r)$, triangularity $\delta(r)$ and Shafranov shift $\Delta(r)$ as illustrated in fig.\ \ref{fig:toroidicity}.
-Firstly, the elongation $\kappa$ is a scale factor determining the height of a flux surface in relation to the minor radius coordinate $r\in[0, a]$.
-The triangularity $\delta$ determines the horizontal shift of the top-most point of the flux surface and finally, the Shafranov shift $\Delta$, which is the shift from the magnetic axis of the center of a flux surface.
-These are set to be linear in $r$ such that they vanish at $r=0$ and is equal to some set value at $r=a$, ie.\ $\kappa(a)=\kappa_a$ and so on.
-For instance, the configuration $(\kappa_a, \delta_a, \Delta_a)=(1, 0, 0)$ would yield a circular cross section with concentric flux surfaces.
+The simulation framework \textsc{DREAM} (\textit{Disruption and Runaway Electron Avoidance Model}) evolves bounce averaged equations of motion in a static magnetic geometry.
+Any flux surface labeled $r$ is parametrized by its major radius $R_0$, elongation $\kappa(r)$, triangularity $\delta(r)$ and Shafranov shift $\Delta(r)$.
+The three latter and the minor radius $a$ are illustrated in fig.\ \ref{fig:toroidicity}.
+Firstly, the elongation is a scale factor determining the ellipticity of the flux surface.
+Here, we set $\kappa(r)=\kappa_0=1.5$ if nothing else is stated, but it can in general be any positive function of $r$.
+The triangularity $\delta(r)$ determines the horizontal shift of the top/bottom-most point of the flux surface and finally, the Shafranov shift $\Delta(r)$, which is the shift from the magnetic axis of the center of a flux surface.
+Both the triangularity and Shafranov shift are set to be linear functions $\delta(r)=\delta_0 r/a$ and $\Delta(r)=\Delta_0 r/a$ respectively, for which we set the default values $\delta_0=0.2$ and $\Delta_0=a/10$.
+For instance, the configuration $(\kappa_0, \delta_0, \Delta_0)=(1, 0, 0)$ would yield a circular cross section with concentric flux surfaces.
 
 Any position $\vec{x}$ is parametrized with the coordinates $(r, \theta)$ by defining $\vec{x}=R\vec{\hat{R}}+z\vec{\hat{z}}$, where
 \begin{align}
@@ -103,23 +106,11 @@ For our purposes, the toroidal term will dominate and therefore a useful approxi
     =\frac{B_0 R_0}{R_0+r}
 \end{align}
 where $B_0=\SI{5}{T}$ is a prescribed value of $B=\abs{\vec{B}}$ at the major radius, ie.\ at $r=0$.
-In the simulations, the major and minor radii are set to $R_0=\SI{0.68}{m}$ and $a=\SI{0.22}{m}$ respectively.
-Also if nothing else is stated, the default value for the shaping parameters are $\kappa_a=1.5$, $\delta_a=0.2$ and $\Delta_a=a/10$.
-% \begin{figure}[H]
-%   \begin{minipage}[l]{0.6\textwidth}
-%     \includesvg[scale=.55]{figs/toroidicity}
-%   \end{minipage}
-%   \hfill
-%   \begin{minipage}[c]{0.4\textwidth}
-%       \caption{\textit{Tokamak cross section illustrating the three shaping parameters used to define the shape of the magnetic field: elongation $\kappa$, triangularity $\delta$ and Shafranov shift $\Delta$.
-%       This image is taken from \cite{DREAM}.}}
-%       \label{fig:toroidicity}
-%   \end{minipage}
-% \end{figure}
+In the simulations, the major and minor radius are set to $R_0=\SI{0.68}{m}$ and $a=\SI{0.22}{m}$ respectively.
 \begin{figure}[H]
     \centering
     \captionsetup{width=.8\textwidth}
-    \includesvg[scale=.7]{figs/toroidicity}
+    \includegraphics[scale=.7 ]{figs/toroidicity.eps}
     \caption{Tokamak cross section illustrating the three shaping parameters used to define the shape of the magnetic field: elongation $\kappa$, triangularity $\delta$ and Shafranov shift $\Delta$.
     This image is taken from \cite{DREAM}.}
     \label{fig:toroidicity}
@@ -128,24 +119,24 @@ Also if nothing else is stated, the default value for the shaping parameters are
 \newpage
 \section{Runaway electrons}
 An electron becomes a runaway after reaching a certain speed $v>v_c$ above which the electric field becomes so strong that the accelerating electric force dominates any drag forces.
-The rate at which the runaway population grows is primarily (\textcolor{red}{Finns det andra sätt?}) due to two phenomena: \textit{Dreicer generation} and \textit{Avalanche generation} \cite{embreus}.
-Together, these add up to a total runaway rate of
+While there are a lot of different ways RE's can be generated, eg.\ due to Compton scattering with photons from the neutron activated wall or tritium $\beta$-decay \cite{hoppePhD}, we will focus on the following two phenomena: \textit{Dreicer mechanism} and \textit{Avalanche multiplication}.
+In a plasma with RE density $n_{RE}$, the total runaway rate is thus
 \begin{align*}
     \dv{n_\text{re}}{t}
-    =\gamma+n_\text{re}\Gamma.
+    =\gamma+n_\text{re}\Gamma,
 \end{align*}
-\textcolor{red}{Mer information om dessa fenonomen}
+where $\gamma$ is the rate due to the Dreicer mechanism and $\Gamma$ is the avalanche growth rate.
 
 During a simulation in \textsc{DREAM}, the program keeps track of the runaway rate as a flux surface averaged quantity
 \begin{align*}
     \expval{\dv{n_\text{re}}{t}}
-    &=\frac{1}{S}\int_0^{2\pi}\diff{\varphi}\int_{-\pi}^{\pi}\diff{\theta}\mathcal{J}\dv{n_\text{re}}{t},\\
-    S
+    &=\frac{1}{V'}\int_0^{2\pi}\diff{\varphi}\int_{-\pi}^{\pi}\diff{\theta}\mathcal{J}\dv{n_\text{re}}{t},\\
+    V'
     &=\int_0^{2\pi}\diff{\varphi}\int_{-\pi}^{\pi}\diff{\theta}\mathcal{J},\\
     \mathcal{J}
     &=\frac{1}{\abs{\grad{\varphi}\vdot(\grad{\theta}\cross\grad{r})}},
 \end{align*}
-where $S$ is the area of the surface and $\mathcal{J}$ is the spatial Jacobian of the coordinate system.
+where $S$ is the area of the surface and $\mathcal{J}$ is the Jacobian of the spatial coordinate system.
 
 In the following section, we investigate the effect the three shaping parameters have on the electron runaway generation individually.
 Firstly, without the Avalanche effect included in the simulations and solely focusing on Dreicer generation \textcolor{red}{(Är dock osäker ifall \texttt{gammaDreicer} verkligen motsvarar hela \texttt{runawaRate} i \textsc{DREAM}, med tanken på den diskrepansen vi såg för några veckor sedan när vi plottade dessa två mot varandra. Vi får diskutera detta i detalj Mathias!)},
@@ -195,7 +186,7 @@ Here $\mu=mv_\perp^2/2B$ denotes the magnetic moment, which is an adiabatic inva
 If the particle ever reaches $v_\parallel=0$, $v_\parallel$ will change sign and it will be forced to turn back.
 It is trapped.
 
-One can obtain a condition for a particle to be trapped based on its initial pitch $\xi_0=v_\parallel/v$ when it is at $B=B_\text{min}$ using conservation of energy \cite{hoppe}.
+One can obtain a condition for a particle to be trapped based on its initial pitch $\xi_0=v_\parallel/v$ when it is at $B=B_\text{min}$ using conservation of energy \cite{hoppeBSc}.
 At any time has the total energy
 \begin{align*}
     E_0
@@ -230,13 +221,16 @@ Secondly, an increased $\Delta$ would result in the contrary: fewer trapped part
 
 \begin{thebibliography}{100}
     \bibitem{DREAM}
-    DREAM documentation, \url{https://ft.nephy.chalmers.se/dream/index.html} (accessed 21/9/21)
+    M.\ Hoppe, O.\ Embréus, T.\ Fülöp. ''DREAM: A fluid-kinetic framework for tokamak disruption runaway electron simulations''. \textit{Computer Physics Communications} \textbf{268} (2021), p.\ 108098. DOI: \texttt{10.1016/j.cpc.2021.108098}.
+
+    \bibitem{hoppePhD}
+    M.\ Hoppe. ''Runaway-electron model development and validation in tokamaks''. PhD thesis. Chalmers University of Technology, 2021. URL: \url{https://research.chalmers.se/publication/527630}
 
     \bibitem{embreus}
-    O.\ Embréus, \textit{Kinetic modelling of runaway in plasmas}, PhD thesis, Chalmers University of Technology, Göteborg (2019)
+    O.\ Embréus. ''Kinetic modelling of runaway in plasmas''. PhD thesis. Chalmers University of Technology, 2019. URL: \url{https://research.chalmers.se/publication/507022}.
 
-    \bibitem{hoppe}
-    M.\ Hoppe, \textit{Simulation of charged particle orbits in fusion plasma}, BSc thesis, Chalmers University of Technology, Göteborg (2015)
+    \bibitem{hoppeBSc}
+    M.\ Hoppe. ''Simulation of charged particle orbits in fusion plasma''. BSc thesis. Chalmers University of Technology, 2015. URL: \url{https://hdl.handle.net/20.500.12380/250827}.
 
 \end{thebibliography}
 
