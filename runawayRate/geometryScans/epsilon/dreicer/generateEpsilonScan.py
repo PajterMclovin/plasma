@@ -1,8 +1,12 @@
 #!/usr/bin/python3
 """
-Created by Hannes Bergström 18/11/21.
+Created by Hannes Bergström 18/11/21,
+modified by Peter Halldestam 20/1/22.
 
 Generates DREAM settings files of different inverse aspect ratios "epsilon".
+
+Effect of toroidicity, reproduction of fig. 6 in paper:
+(E Nilsson et al 2015 Plasma Phys. Control. Fusion 57 095006)
 """
 import sys, os
 import numpy as np
@@ -11,22 +15,28 @@ dir = os.path.dirname(os.path.realpath(__file__))
 
 # Parameters import
 sys.path.append(os.path.join(dir, '../../../..'))
-from parameters import MAJOR_RADIUS, ELECTRON_DENSITY
+import parameters as p
 
 # helper function import
 sys.path.append(os.path.join(dir, '../../..'))
 from configureDREAM import ConfigureDREAM
-# Geometries
-from DREAM.Settings.RadialGrid import TYPE_CYLINDRICAL as CYLINDRICAL
-from DREAM.Settings.RadialGrid import TYPE_ANALYTIC_TOROIDAL as TOROIDAL
- 
+from configureDREAM import CYLINDRICAL, TOROIDAL
 
-mR = 0.9 * MAJOR_RADIUS
-wR = 1.2*mR
+# import formula
+sys.path.append(p.DREAM_PATH)
+from DREAM.Formulas.PlasmaParameters import getEc
 
-T = 500
+# tokamak geometry
+a = 0.8 * p.MAJOR_RADIUS    # minor radius
+b = 1.2 * a                 # wall radius
 
-n_e = ELECTRON_DENSITY
+# plasma parameters
+T = 5e2               # temperature
+n = 2e19#p.ELECTRON_DENSITY      # plasma density
+E = 40 * getEc(T, n)        # Connor-Hastie critical electric field
+# print(14.9 - 0.5*np.log(n / 1e20) + np.log(T / 1e3))
+
+n_e = p.ELECTRON_DENSITY
 c = 299792458
 q = 1.6e-19
 lnC = 4
@@ -34,20 +44,22 @@ epsilon_0 = 8.85e-12
 m_0 = 9.1e-31
 
 E_field = 40 * n_e * q**3 * lnC / (4*np.pi * epsilon_0**2 * m_0 * c**2)
-
+# print(E, E_field)
+#
+# E=E_field
 if __name__ == "__main__":
 
-    ConfigureDREAM(include=['fluid/runawayRate', 'fluid/gammaDreicer'],
-                   temperature=T, electricField=E_field,
-                   geometry=CYLINDRICAL, wallRadius=wR,
-                   minorRadius=mR, verbose=(len(sys.argv)==2),
+    ConfigureDREAM(include='fluid',
+                   temperature=T, electricField=E,
+                   geometry=CYLINDRICAL, wallRadius=b,
+                   minorRadius=a, verbose=(len(sys.argv)==2),
                    output=f'outputs/output_cyl.h5',
                    save=f'settings/setting_cyl.h5')
 
 
-    ConfigureDREAM(include=['fluid/runawayRate', 'fluid/gammaDreicer'],
-                   temperature=T, electricField=E_field,    
-                   geometry=TOROIDAL, wallRadius=wR,
-                   minorRadius=mR, verbose=(len(sys.argv)==2),
+    ConfigureDREAM(include='fluid',
+                   temperature=T, electricField=E,
+                   geometry=TOROIDAL, wallRadius=b,
+                   minorRadius=a, verbose=(len(sys.argv)==2),
                    output=f'outputs/output_tor.h5',
                    save=f'settings/setting_tor.h5')

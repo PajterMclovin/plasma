@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 # make sure path to DREAM exists
-DREAM_PATH = '/home/peterhalldestam/DREAM/py'  # /path/to/DREAM/py
+DREAM_PATH = '/home/pethalld/DREAM/py'  # /path/to/DREAM/py
 try:
     sys.path.append(DREAM_PATH)
     import DREAM
@@ -29,17 +29,17 @@ WALL_RADIUS = 1.2 * MINOR_RADIUS
 MAGNETIC_FIELD = 5e0  # on-axis magnetic field strength
 
 # Grid parameter maxima
-MAX_MOMENTUM        = 1e2                # max momentum in units of m_e*c, appropiately ~1e2 for avalanche simulations
+MAX_MOMENTUM        = 1e0               # max momentum in units of m_e*c, appropiately ~1e2 for avalanche simulations
 MAX_PITCH_STEP      = 1e-2               # max pitch step
-MAX_TIME            = 2.5e-1             # simulation time in seconds
-MAX_SHAFRANOV_SHIFT = 0.1 * MINOR_RADIUS # max Shafranov shift
-MAX_TRIANGULARITY   = 0.2                # max triangularity
-MAX_ELONGATION      = 1.5                # max elongation
+MAX_TIME            = 5e-1             # simulation time in seconds
+MAX_SHAFRANOV_SHIFT = 0#0.1 * MINOR_RADIUS # max Shafranov shift
+MAX_TRIANGULARITY   = 0#0.2                # max triangularity
+MAX_ELONGATION      = 1                # max elongation
 
 
 # Grid parameters resolution
-N_MOMENTUM        = 150 # no. momentum grid points
-N_PITCH           = 50   # no. pitch grid points
+N_MOMENTUM        = 70 # no. momentum grid points
+N_PITCH           = 40 # no. pitch grid points
 N_TIME            = 20 # no. time steps
 N_RADIUS          = 20   # no. radial grid points
 N_POLODIAL_FLUX   = 20  # no. poloidal flux grid points

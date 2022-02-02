@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 '''
-Created by Peter Halldestam 20/1/22
+Created by Peter Halldestam 24/1/22
+
+2nd version
 
 Effect of toroidicity, reproduction of fig. 6 in paper:
 (E Nilsson et al 2015 Plasma Phys. Control. Fusion 57 095006)
@@ -26,7 +28,7 @@ import DREAM.Settings.CollisionHandler as Collisions
 
 from DREAM.Formulas.PlasmaParameters import getEc
 
-HOTTAIL = True
+HOTTAIL = False
 
 # plasma parameters
 n = 2e19    # Electron density (m^-3)
@@ -92,18 +94,22 @@ def generate(majorRadius):
 
     ds.runawaygrid.setEnabled(False)
 
+    if np.isinf(majorRadius):
+        ds.radialgrid.setType(RadialGrid.TYPE_CYLINDRICAL)
+        ds.radialgrid.setB0(B0)
 
-    # radial grid, circular plasma
-    ds.radialgrid.setType(RadialGrid.TYPE_ANALYTIC_TOROIDAL)
+    else:
+        # radial grid, circular plasma
+        ds.radialgrid.setType(RadialGrid.TYPE_ANALYTIC_TOROIDAL)
 
 
-    # Poloidal flux
-    mu0 = constants.mu_0
-    rref = np.linspace(0, a, 20)
-    psiref = -mu0 * IpRef * (1-(rref / a)**2) * a
+        # Poloidal flux
+        mu0 = constants.mu_0
+        rref = np.linspace(0, a, 20)
+        psiref = -mu0 * IpRef * (1-(rref / a)**2) * a
 
-    # set radial grid shape
-    ds.radialgrid.setShaping(psi=psiref, rpsi=rref, GOverR0=B0)
+        # set radial grid shape
+        ds.radialgrid.setShaping(psi=psiref, rpsi=rref, GOverR0=B0)
 
     ds.radialgrid.setNr(nr)
     ds.radialgrid.setMinorRadius(a)
@@ -116,17 +122,15 @@ def generate(majorRadius):
     ds.timestep.setNt(Nt)
     return ds
 
-## cylindrical limit, epsilon = 0
-dsCyl = generate(np.inf)
-dsCyl.radialgrid.visualize(nr=8, ntheta=40)
-do = runiface(dsCyl, 'output_cyl.h5', quiet=False)
-gamma0 = do.other.fluid.runawayRate.data[-1,:].mean()
-print(gamma0)
+# ## cylindrical limit, epsilon = 0
+# dsCyl = generate(np.inf)
+# do = runiface(dsCyl, 'output_cyl.h5', quiet=False)
+# gamma0 = do.other.fluid.runawayRate.data[-1,:].mean()
+# print(gamma0)
 
 ## toroidal, epsilon > 0
 dsTor = generate(R0)
-dsTor.radialgrid.visualize(nr=8, ntheta=40)
 do = runiface(dsTor, 'output_tor.h5', quiet=False)
 
-do.other.fluid.runawayRate.plot(t=-1, weight=1/gamma0)
+do.other.fluid.runawayRate.plot(t=-1)
 plt.show()

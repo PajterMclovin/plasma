@@ -19,7 +19,7 @@ from configureDREAM import ConfigureDREAM
 # Geometries
 from DREAM.Settings.RadialGrid import TYPE_CYLINDRICAL as CYLINDRICAL
 from DREAM.Settings.RadialGrid import TYPE_ANALYTIC_TOROIDAL as TOROIDAL
- 
+
 
 mR = 0.9 * MAJOR_RADIUS
 wR = 1.2*mR
@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     ConfigureDREAM(include=['fluid/runawayRate', 'fluid/gammaDreicer', 'fluid/GammaAva'],
                    avalanche=True,
-                   temperature=T, electricField=E_field,    
+                   temperature=T, electricField=E_field,
                    geometry=TOROIDAL, wallRadius=wR,
                    minorRadius=mR, verbose=(len(sys.argv)==2),
                    output=f'outputs/output_tor.h5',

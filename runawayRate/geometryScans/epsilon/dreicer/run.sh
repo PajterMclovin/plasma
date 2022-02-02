@@ -5,7 +5,7 @@
 #         runs DREAM simulations for each created DREAM setting.
 #
 
-DREAM_PATH="/home/hannber/DREAM/" # /path/to/DREAM/
+DREAM_PATH="/home/pethalld/DREAM/" # /path/to/DREAM/
 DREAMI_PATH="${DREAM_PATH}build/iface/dreami"
 DREAM_SETTINGS_DIR="./settings/"
 DREAM_OUTPUTS_DIR="./outputs/"
@@ -94,4 +94,4 @@ do
 done
 
 ## plot runaway rates and compare
-#python3 $VISUALIZE
+python3 $VISUALIZE

@@ -47,8 +47,8 @@ elif len(sys.argv) == 1:
             Delta = float(fp[len('output'):-len('.h5')])    # extract Shafranov shift
             outputFile = os.path.join(outputDir, fp)
             do = DREAMOutput(outputFile)
-            # ax1 = plotRunawayRateMinorRadius(do, ax=ax1, label=f'{Delta:4.5}')
-            ax1 = plotEffectivePassingFractionMinorRadius(do, ax=ax1, label=f'{Delta:4.5}')
+            ax1 = plotRunawayRateMinorRadius(do, ax=ax1, label=f'{Delta:4.5}')
+            # ax1 = plotEffectivePassingFractionMinorRadius(do, ax=ax1, label=f'{Delta:4.5}')
             ax2 = plotFluxSurface(Delta=Delta, ax=ax2, label=f'{Delta:4.5}')
 
 else:

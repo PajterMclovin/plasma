@@ -61,7 +61,8 @@ ax2.set_ylabel(r'height $z$ [m]')
 ax2.set_xlabel(r'major radius $R$ [m]')
 ax2.yaxis.set_label_position('right')
 ax2.yaxis.tick_right()
-# import tikzplotlib
-
+# import tikzplotli
+ax2.axis([0,1,-.5,.5])
+# ax2.axis('square')
 # tikzplotlib.save("test.tex")
 plt.show()

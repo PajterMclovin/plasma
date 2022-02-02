@@ -92,6 +92,7 @@ class ConfigureDREAM:
                     self.ds.other.include(quantity)
             else:
                 self.ds.other.include(self.include)
+        # if self.geometry == TOROIDAL: self.ds.radialgrid.visualize()
 
         # prepare simulation
         self.ds.output.setTiming(stdout=True, file=True)
@@ -115,16 +116,18 @@ class ConfigureDREAM:
         ds.radialgrid.setType(TOROIDAL)
 
         # Set shaping parameters
-        kappa = np.linspace(0, self.maxElongation, p.N_ELONGATION)
-        delta = np.linspace(0, self.maxTriangularity, p.N_TRIANGULARITY)
-        Delta = np.linspace(0, self.maxShafranovShift, p.N_SHAFRANOV_SHIFT)
+        # kappa = np.linspace(1, self.maxElongation, p.N_ELONGATION)
+        delta, rdelta = 0, 0
+        if not self.maxTriangularity == 0:
+            delta = np.linspace(0, self.maxTriangularity, p.N_TRIANGULARITY)
+            rdelta = np.linspace(0, self.minorRadius, p.N_TRIANGULARITY)
 
-        # Set up input radial grids
-        rkappa = np.linspace(0, self.minorRadius, p.N_ELONGATION)
-        rdelta = np.linspace(0, self.minorRadius, p.N_TRIANGULARITY)
-        rDelta = np.linspace(0, self.minorRadius, p.N_SHAFRANOV_SHIFT)
+        Delta, rDelta = 0, 0
+        if not self.maxShafranovShift == 0:
+            Delta = np.linspace(0, self.maxShafranovShift, p.N_SHAFRANOV_SHIFT)
+            rDelta = np.linspace(0, self.minorRadius, p.N_SHAFRANOV_SHIFT)
 
-        # Toroidal field function
+        # # Toroidal field function
         GOverR0 = p.MAGNETIC_FIELD     # = R*Bphi/R0
 
         # Poloidal flux
@@ -134,13 +137,14 @@ class ConfigureDREAM:
         # set radial grid shape
         ds.radialgrid.setMajorRadius(self.majorRadius)
         ds.radialgrid.setShaping(psi=psi, rpsi=rpsi, GOverR0=GOverR0,
-                                 kappa=kappa, rkappa=rkappa,
+                                 kappa=float(self.maxElongation),
                                  Delta=Delta, rDelta=rDelta,
                                  delta=delta, rdelta=rdelta)
 
+
         # automatically adjust xi-grid
         ds.hottailgrid.setTrappedPassingBoundaryLayerGrid(dxiMax=p.MAX_PITCH_STEP)
-
+        ds.radialgrid.visualize()
 
     def configureGrids(self):
         """
@@ -150,6 +154,11 @@ class ConfigureDREAM:
             print(self.configureGrids.__doc__)
 
         ds = self.ds
+
+        # general radial grid settings
+        ds.radialgrid.setWallRadius(self.wallRadius)
+        ds.radialgrid.setMinorRadius(self.minorRadius)
+        ds.radialgrid.setNr(p.N_RADIUS)
 
         if self.geometry == CYLINDRICAL:
             if self.verbose:
@@ -164,10 +173,6 @@ class ConfigureDREAM:
         else:
             raise ValueError("Invalid geometry input!")
 
-        # general radial grid settings
-        ds.radialgrid.setWallRadius(self.wallRadius)
-        ds.radialgrid.setMinorRadius(self.minorRadius)
-        ds.radialgrid.setNr(p.N_RADIUS)
 
         # hot-tail and runaway grid settings
         if self.avalanche == AVALANCHE_KINETIC:
@@ -180,12 +185,12 @@ class ConfigureDREAM:
             ds.runawaygrid.setPmax(p.MAX_MOMENTUM)
         else:
 
-#            ds.hottailgrid.setNxi(p.N_PITCH)
-#            ds.hottailgrid.setNp(p.N_MOMENTUM)
-#            ds.hottailgrid.setPmax(p.MAX_MOMENTUM)
+            ds.hottailgrid.setNxi(p.N_PITCH)
+            ds.hottailgrid.setNp(p.N_MOMENTUM)
+            ds.hottailgrid.setPmax(p.MAX_MOMENTUM)
 
 
-            ds.hottailgrid.setEnabled(False)
+            # ds.hottailgrid.setEnabled(False)
             # ds.runawaygrid.setEnabled(True)
             # ds.runawaygrid.setNxi(p.N_PITCH)
             # ds.runawaygrid.setNp(p.N_MOMENTUM)
@@ -210,6 +215,10 @@ class ConfigureDREAM:
 
         ds.eqsys.E_field.setPrescribedData(self.electricField)
         ds.eqsys.T_cold.setPrescribedData(self.temperature)
+        #
+        # rT = np.linspace(0, a, p.N_RADIUS)
+        # T = self.temperature * (1 - .99 * (r/a)**2)
+        # ds.eqsys.T_cold.setPrescribedData(temperature=T, radius=rT)
 
         # Set initial hot electron Maxwellian
         ds.eqsys.f_hot.setInitialProfiles(n0=p.ELECTRON_DENSITY, T0=self.temperature)
@@ -229,9 +238,10 @@ class ConfigureDREAM:
         else:
             pCut = 0
             ds.solver.setType(LINEAR_IMPLICIT)
+            ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche)
 
         # ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut)
-        ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut, avaTrapping=self.avaTrapping)
+#        ds.eqsys.n_re.setAvalanche(avalanche=self.avalanche, pCutAvalanche=pCut) #, avaTrapping=self.avaTrapping)
 
 
         # Set boundary condition type at pMax
@@ -248,4 +258,4 @@ class ConfigureDREAM:
 
 if __name__ == '__main__':
 
-    ConfigureDREAM(include='fluid/runawayRate', verbose=(len(sys.argv)==2))
+    ConfigureDREAM(geometry=CYLINDRICAL, include='fluid/runawayRate', verbose=(len(sys.argv)==2))

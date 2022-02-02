@@ -58,19 +58,20 @@
 
 \maketitle
 
-\abstract{\noindent In a tokamak plasma, \textit{runaway electrons} (RE) are created when the force from the toroidal electric field is greater than the drag force due to Coulomb collisions.
+\abstract{\noindent In a plasma, \textit{runaway electrons} (RE) are created when the force from the macroscopic electric field is greater than the drag force due to collisions with other particles in the plasma.
 This results in an acceleration of electrons to extremely high velocities which in turn may damage components of the fusion reactor facing the plasma.
 In this report we consider the cross sectional shape of the magnetic field and study its effect on RE generation using the newly developed \textsc{DREAM} \cite{DREAM}.}
 
 \section{Parametrisation of the toroidal magnetic field}
+\label{sec:param}
 The simulation framework \textsc{DREAM} (\textit{Disruption and Runaway Electron Avoidance Model}) evolves bounce averaged equations of motion in a static magnetic geometry.
 Any flux surface labeled $r$ is parametrized by its major radius $R_0$, elongation $\kappa(r)$, triangularity $\delta(r)$ and Shafranov shift $\Delta(r)$.
 The three latter and the minor radius $a$ are illustrated in fig.\ \ref{fig:toroidicity}.
 Firstly, the elongation is a scale factor determining the ellipticity of the flux surface.
-Here, we set $\kappa(r)=\kappa_0=1.5$ if nothing else is stated, but it can in general be any positive function of $r$.
+Here, we set a constant $\kappa(r)=\kappa_0$, but it can in general be any positive function of $r$.
 The triangularity $\delta(r)$ determines the horizontal shift of the top/bottom-most point of the flux surface and finally, the Shafranov shift $\Delta(r)$, which is the shift from the magnetic axis of the center of a flux surface.
-Both the triangularity and Shafranov shift are set to be linear functions $\delta(r)=\delta_0 r/a$ and $\Delta(r)=\Delta_0 r/a$ respectively, for which we set the default values $\delta_0=0.2$ and $\Delta_0=a/10$.
-For instance, the configuration $(\kappa_0, \delta_0, \Delta_0)=(1, 0, 0)$ would yield a circular cross section with concentric flux surfaces.
+Both the triangularity and Shafranov shift are set to be linear functions $\delta(r)=\delta_0 r/a$ and $\Delta(r)=\Delta_0 r/a$ respectively.
+For instance, the configuration $(\kappa_0, \delta_0, \Delta_0)=(1, 0, 0)$ yields a circular cross section with concentric flux surfaces, which is used as the baseline geometry in secs.\ \ref{sec:dreicer} and \ref{sec:avalanche}.
 
 Any position $\vec{x}$ is parametrized with the coordinates $(r, \theta)$ by defining $\vec{x}=R\vec{\hat{R}}+z\vec{\hat{z}}$, where
 \begin{align}
@@ -118,14 +119,46 @@ In the simulations, the major and minor radius are set to $R_0=\SI{0.68}{m}$ and
 
 \newpage
 \section{Runaway electrons}
-An electron becomes a runaway after reaching a certain speed $v>v_c$ above which the electric field becomes so strong that the accelerating electric force dominates any drag forces.
-While there are a lot of different ways RE's can be generated, eg.\ due to Compton scattering with photons from the neutron activated wall or tritium $\beta$-decay \cite{hoppePhD}, we will focus on the following two phenomena: \textit{Dreicer mechanism} and \textit{Avalanche multiplication}.
-In a plasma with RE density $n_{RE}$, the total runaway rate is thus
+Consider a single electron with velocity $v$ in a plasma of both electrons and ions.
+The drag force experienced by it scales as $F_\text{drag}\sim m_ev\nu$, where $\nu$ is the collision frequency.
+Unlike a regular gas, in which close pair-wise collisions prevail, a plasma is dominated by long range Coloumb interactions.
+As a consequence of this, the drag force differs significantly for \textit{cold} and \textit{hot} electrons (ie.\ those with $v\ll v_\text{th}$ or vice versa, where $v_\text{th}$ is the thermal velocity).
+The relative velocity as seen by the electron, and thus the collision frequency, is predominantly due to the thermal motion of the surrounding plasma particles for cold electrons.
+With the collision frequency $\nu=\nu_\text{th}$ for a thermal plasma and therefore $F_\text{drag}\propto v$.
+On the other hand, for hot electrons the relative velocity is dominated by their own velocity $v$ so that $\nu\propto 1/v^3$, and thus $F_\text{drag}\propto 1/v^2$ \cite{vallhagenMSc}.
+This behaviour is captured in fig.\ \ref{fig:dragForce}.
+\begin{figure}[H]
+    \centering
+    \captionsetup{width=.8\textwidth}
+    \includegraphics[scale=.6]{figs/dragForce.eps}
+    \caption{Illustration of the drag force experienced by a electron with velocity $v$ in a plasma with an electric field $E_\parallel$ in magnetic field direction.
+    The critical velocity $v_\text{c}$ is marked where the drag force becomes smaller than the accelerating force due to the electric field.}
+    \label{fig:dragForce}
+\end{figure}
+\noindent
+Therefore, there must exist a critical speed $v_\text{c}>v_\text{th}$ such that
+\begin{align*}
+    \pdv{v_\parallel}{t}=-eE_\parallel+F_\text{drag}>0, \quad v>v_\text{c}.
+\end{align*}
+Here $v_\parallel$ and $E_\parallel$ are the electron velocity and the macroscopic electric field, both projected onto the direction of the magnetic field.
+These are accelerated towards the speed of light, hence the name runaways.
+As the plasma strives to maintain thermal equilibrium, this gap in the electron distribution will continuously be refilled as slower electrons diffuse into the $v>v_\text{c}$ region, which in turn becomes RE's.
+This phenomenon is called the \textit{Dreicer mechanism} after Harry Dreicer, who gave the first detailed account on RE's \cite{dreicer1, dreicer2}.
+
+There are other ways of producing RE's without the need of an already existing RE population, known as ''primary'' mechanisms.
+In this category we have eg.\ Compton scattering of photons radiating from the neutron activated wall and $\beta$-decay of tritium \cite{hoppePhD}, but these are neglected in this project.
+The only primary generation mechanism that is considered is the Dreicer mechanism.
+
+Provided this seed of RE's, the population can be amplified by the ''secondary'' generation mechanism, also called \textit{avalanche multiplication}.
+Via large-angle Coloumb collisions of existing runaways with slower electrons such that both end up with a velocity higher than the critical velocity $v_c$, this mechanism leads to an exponential growth of the RE population \cite{vallhagenMSc}. \textcolor{red}{Nåt om hur de förlorar energi också\dots}
+
+In a plasma with a density $n_\text{re}$ of electrons with $v>v_\text{c}$, the rate of which runaways are generated due to these two mechanisms is given by the equation
 \begin{align*}
     \dv{n_\text{re}}{t}
     =\gamma+n_\text{re}\Gamma,
 \end{align*}
-where $\gamma$ is the rate due to the Dreicer mechanism and $\Gamma$ is the avalanche growth rate.
+where $\gamma$ is the rate due to the Dreicer mechanism and $\Gamma$ is the avalanche growth rate \cite{hoppePhD}.
+
 
 During a simulation in \textsc{DREAM}, the program keeps track of the runaway rate as a flux surface averaged quantity
 \begin{align*}
@@ -138,11 +171,13 @@ During a simulation in \textsc{DREAM}, the program keeps track of the runaway ra
 \end{align*}
 where $S$ is the area of the surface and $\mathcal{J}$ is the Jacobian of the spatial coordinate system.
 
-In the following section, we investigate the effect the three shaping parameters have on the electron runaway generation individually.
-Firstly, without the Avalanche effect included in the simulations and solely focusing on Dreicer generation \textcolor{red}{(Är dock osäker ifall \texttt{gammaDreicer} verkligen motsvarar hela \texttt{runawaRate} i \textsc{DREAM}, med tanken på den diskrepansen vi såg för några veckor sedan när vi plottade dessa två mot varandra. Vi får diskutera detta i detalj Mathias!)},
-and later including both phenomena.
+In the following sections, we investigate the effect the tokamak geometry have on this flux averaged electron runaway generation individually.
+Firstly, without the Avalanche effect included in the simulations and solely focusing on Dreicer generation $\gamma$, we vary the three shaping parameters individually with the baseline geometry being that of a circular plasma cross section with concentric flux surfaces.
+Furthermore, we also study the effect the toroidicity $\epsilon=r/R_0$ has on the RE generation to compare with a similar investigation by E.\ Nilsson \textit{et al} \cite{Nilsson} which is based on the code \textsc{LUKE}, a solver of the 3D linearized bounce averaged relativistic electron Fokker-Planck equation.
+Then we do the same set of studies focusing in the avalanche multiplication factor $\Gamma$.
 
 \subsection{Dreicer generation}
+\label{sec:dreicer}
 In fig.\ \ref{fig:elongation}, the runaway rates from three different simulation with different orders of magnitude in the elongation $\kappa$ are shown to the left and an outlining of their corresponding tokamak cross sections to the right.
 The elongation has seemingly no effect on the runaway generation, at least in this range of values.
 Out of all three shaping parameters, this seems to be case only for $\kappa$.
@@ -217,17 +252,25 @@ This conclusion fits rather well with what is observed in fig.\ \ref{fig:triangu
 Secondly, an increased $\Delta$ would result in the contrary: fewer trapped particles, which also fits the observation from fig.\ \ref{fig:shafranovShift}.
 
 \subsection{Avalanche generation}
-\textcolor{red}{inkludera Avalanche i motsvarande simuleringar.}
-
+\label{sec:avalanche}
 \begin{thebibliography}{100}
     \bibitem{DREAM}
     M.\ Hoppe, O.\ Embréus, T.\ Fülöp. ''DREAM: A fluid-kinetic framework for tokamak disruption runaway electron simulations''. \textit{Computer Physics Communications} \textbf{268} (2021), p.\ 108098. DOI: \texttt{10.1016/j.cpc.2021.108098}.
 
-    \bibitem{hoppePhD}
-    M.\ Hoppe. ''Runaway-electron model development and validation in tokamaks''. PhD thesis. Chalmers University of Technology, 2021. URL: \url{https://research.chalmers.se/publication/527630}
+    \bibitem{vallhagenMSc}
+    O.\ Vallhagen. ''Disruption mitigation in tokamaks with shattered pellet injection''. MSc thesis. Chalmers University of Technology, 2021. URL: \url{https://hdl.handle.net/20.500.12380/302296}.
 
-    \bibitem{embreus}
-    O.\ Embréus. ''Kinetic modelling of runaway in plasmas''. PhD thesis. Chalmers University of Technology, 2019. URL: \url{https://research.chalmers.se/publication/507022}.
+    \bibitem{hoppePhD}
+    M.\ Hoppe. ''Runaway-electron model development and validation in tokamaks''. PhD thesis. Chalmers University of Technology, 2021. URL: \url{https://research.chalmers.se/publication/527630}.
+
+    \bibitem{dreicer1}
+    H.\ Dreicer. ''Electron and ion runaway in a fully ionized gas. I''. \textit{Physical Review} \textbf{115} (1959), p.\ 238. DOI: \texttt{10.1103/PhysRev.115.238}.
+
+    \bibitem{dreicer2}
+    H.\ Dreicer. ''Electron and ion runaway in a fully ionized gas. II''. \textit{Physical Review} \textbf{117} (1960), p.\ 329. DOI: \texttt{10.1103/PhysRev.117.329}.
+
+    % \bibitem{embreus}
+    % O.\ Embréus. ''Kinetic modelling of runaway in plasmas''. PhD thesis. Chalmers University of Technology, 2019. URL: \url{https://research.chalmers.se/publication/507022}.
 
     \bibitem{hoppeBSc}
     M.\ Hoppe. ''Simulation of charged particle orbits in fusion plasma''. BSc thesis. Chalmers University of Technology, 2015. URL: \url{https://hdl.handle.net/20.500.12380/250827}.

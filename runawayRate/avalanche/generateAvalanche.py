@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+Q#!/usr/bin/python3
 """
 Created by Peter Halldestam 9/12/21
 
@@ -22,13 +22,13 @@ from configureDREAM import CYLINDRICAL
 
 if __name__ == "__main__":
 
-    a = .9 * MAJOR_RADIUS
+    a = .1 * MAJOR_RADIUS
 
     ConfigureDREAM(geometry=CYLINDRICAL,
                    avalanche=AVALANCHE_FLUID,
                    minorRadius=a,
                    wallRadius=1.2*a,
-                   include=['fluid/runawayRate', 'fluid/gammaDreicer'],
+                   include=['fluid'],
                    output=f'outputs/baseline.h5',
                    save=f'settings/baseline.h5')
 
@@ -39,10 +39,10 @@ if __name__ == "__main__":
                    output=f'outputs/neglect.h5',
                    save=f'settings/neglect.h5')
 
-    ConfigureDREAM(avalanche=AVALANCHE_FLUID,
-                   avaTrapping=AVALANCHE_TRAPPING_INCLUDE,
-                   minorRadius=a,
-                   wallRadius=1.2*a,
-                   include=['fluid/GammaAva', 'fluid/runawayRate', 'fluid/gammaDreicer'],
-                   output=f'outputs/include.h5',
-                   save=f'settings/include.h5')
+#    ConfigureDREAM(avalanche=AVALANCHE_FLUID,
+#                   avaTrapping=AVALANCHE_TRAPPING_INCLUDE,
+#                   minorRadius=a,
+#                   wallRadius=1.2*a,
+#                   include=['fluid/GammaAva','fluid/runawayRate', 'fluid/gammaDreicer'],
+#                   output=f'outputs/include.h5',
+#                   save=f'settings/include.h5')

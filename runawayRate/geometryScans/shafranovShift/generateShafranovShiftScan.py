@@ -27,7 +27,7 @@ scanValues = np.linspace(-.2, .2, nScanValues) * MAJOR_RADIUS
 if __name__ == "__main__":
 
     for scanValue in scanValues:
-
+        print(scanValue)
         ConfigureDREAM(include=['fluid/runawayRate', 'fluid/gammaDreicer'],
                        maxShafranovShift=scanValue, verbose=(len(sys.argv)==2),
                        output=f'outputs/output{scanValue}.h5',

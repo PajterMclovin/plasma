@@ -35,6 +35,8 @@ FIGSIZE = (10, 5)
 def plotAvalancheMultiplicationFactor(do, ax=None, label=None, normalize=False, show=False, verbose=False):
     """
     Plot avalanche multiplication factor Gamma vs. minor radius. Returns Axes object.
+    NOTE: assumes dn_re/dt = gammaDreicer + n_re * GammaAva.
+
 
     DREAM.DREAMOutput do :      DREAM settings object.
     matplotlib.axes.Axes ax :   Axes object used for plotting.
@@ -49,7 +51,11 @@ def plotAvalancheMultiplicationFactor(do, ax=None, label=None, normalize=False, 
         print(plotAvalancheMultiplicationFactor.__doc__)
 
     try:
-        GammaAva = do.other.fluid.GammaAva.data[-1,:]
+        gammaDreicer = do.other.fluid.gammaDreicer[-1,:]
+        runawayRate = do.other.fluid.runawayRate[-1,:]
+        nRe = do.eqsys.n_re[-1,:]
+        GammaAva = (runawayRate - gammaDreicer) / nRe
+
         epsilon = do.grid.r / p.MAJOR_RADIUS
     except AttributeError as err:
         raise Exception('Output does not include needed data.') from err
@@ -97,7 +103,7 @@ def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, ve
     if ax is None:
         ax = plt.axes()
 
-    ax.semilogy(time, runawayRate, label=label)
+    ax.plot(time, runawayRate, label=label)
 
     if show:
         plt.show()
@@ -119,7 +125,7 @@ def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, show=Fa
     bool verbose :              Show information.
     """
     if verbose:
-        print(plotRunawayRate.__doc__)
+        print(plotRunawayRateMinorRadius.__doc__)
 
     try:
         runawayRate = do.other.fluid.runawayRate.data[-1,:] # at final time step

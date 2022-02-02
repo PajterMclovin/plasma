@@ -21,12 +21,12 @@ sys.path.append(os.path.join(dir, '../..'))
 from configureDREAM import ConfigureDREAM
 
 # Scan parameters
-nScanValues = 5
-scanValues = MAX_ELONGATION * np.linspace(1e-1, 1e1, nScanValues)
+scanValues = [.1, 1, 10]
 
 if __name__ == "__main__":
 
     for scanValue in scanValues:
+        print(scanValue)
 
         ConfigureDREAM(include=['fluid/runawayRate', 'fluid/gammaDreicer'],
                        maxElongation=scanValue, verbose=(len(sys.argv)==2),
