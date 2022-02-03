@@ -8,6 +8,8 @@ Visualizes DREAM output data for a range of elongations.
 """
 
 import matplotlib.pyplot as plt
+
+
 import numpy as np
 import sys, os
 
@@ -17,7 +19,7 @@ dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(dir, '../..'))
 from plotDREAM import FIGSIZE
 from plotDREAM import plotRunawayRateMinorRadius
-from plotDREAM import plotFluxSurface
+from plotDREAM import plotEffectivePassingFractionMinorRadius
 
 # Settings object import
 sys.path.append(os.path.join(dir, '../../..'))
@@ -28,41 +30,64 @@ from DREAM.DREAMOutput import DREAMOutput
 sys.path.append(os.path.join(dir, 'outputs'))
 outputDir = os.path.join(dir, 'outputs')
 
-# initialize figure and 1x2 axes
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=FIGSIZE)
 
-# visualize specified output
-if len(sys.argv) == 2:
-    ax1 = plotRunawayRate(sys.argv[1], ax=ax1)
-    ax2 = plotFluxSurface(ax=ax2)
 
-# visualize all outputs
-elif len(sys.argv) == 1:
+fig, ax = plt.subplots(1, 1, figsize=FIGSIZE)
 
-    # sort by increasing triangularity
-    for fp in sorted(os.listdir(outputDir), key=lambda x: float(x[len('output'):-3])):
+c = ['r', 'g', 'b']
 
-        # load output and plot
-        if fp.startswith('output') and fp.endswith('.h5'):
-            kappa = float(fp[len('output'):-len('.h5')])    # extract elongation
-            outputFile = os.path.join(outputDir, fp)
-            do = DREAMOutput(outputFile)
-            ax1 = plotRunawayRateMinorRadius(do, ax=ax1, label=f'{kappa:4.5}')
-            ax2 = plotFluxSurface(kappa=kappa, ax=ax2, label=f'{kappa:4.5}')
+for i, fp in enumerate(sorted(os.listdir(outputDir), key=lambda x: float(x[len('output'):-len('.h5')]))):
+    if fp.startswith('output') and fp.endswith('.h5'):
+        kappa = float(fp[len('output'):-len('.h5')])
+        outputFile = os.path.join(outputDir, fp)
+        do = DREAMOutput(outputFile)
+        ax = plotRunawayRateMinorRadius(do, ax=ax, label=f'{kappa:4.5}', normalize=True, c=c[i])
 
-else:
-    raise ValueError('Expected at most one argument.')
+for i, fp in enumerate(sorted(os.listdir(outputDir), key=lambda x: float(x[len('output'):-len('.h5')]))):
+    if fp.startswith('output') and fp.endswith('.h5'):
+        kappa = float(fp[len('output'):-len('.h5')])
+        outputFile = os.path.join(outputDir, fp)
+        do = DREAMOutput(outputFile)
+        ax = plotEffectivePassingFractionMinorRadius(do, ax=ax, normalize=True, c=c[i])
 
-# plot settings
-ax1.legend(title=r'Elongation $\kappa$')
-ax1.set_ylabel(r'runaway rate $\frac{dn_{re}}{dt}$ [s$^{-1}$m$^{-3}$]')
-ax1.set_xlabel(r'minor radius $r$ [m]')
-ax2.set_ylabel(r'height $z$ [m]')
-ax2.set_xlabel(r'major radius $R$ [m]')
-ax2.yaxis.set_label_position('right')
-ax2.yaxis.tick_right()
-# import tikzplotli
-ax2.axis([0,1,-.5,.5])
-# ax2.axis('square')
-# tikzplotlib.save("test.tex")
+
+ax.legend(title=r'Elongation $\kappa$')
+ax.set_ylabel(r'$\gamma/\gamma_0$')
+ax.set_xlabel(r'r/a')
+#
+# # initialize figure and 1x2 axes
+# fig, (ax1, ax2) = plt.subplots(1, 2, figsize=FIGSIZE)
+#
+# # visualize specified output
+# if len(sys.argv) == 2:
+#     ax1 = plotRunawayRate(sys.argv[1], ax=ax1)
+#     ax2 = plotFluxSurface(ax=ax2)
+#
+# # visualize all outputs
+# elif len(sys.argv) == 1:
+#
+#     # sort by increasing triangularity
+#     for fp in sorted(os.listdir(outputDir), key=lambda x: float(x[len('output'):-3])):
+#
+#         # load output and plot
+#         if fp.startswith('output') and fp.endswith('.h5'):
+#             kappa = float(fp[len('output'):-len('.h5')])    # extract elongation
+#             outputFile = os.path.join(outputDir, fp)
+#             do = DREAMOutput(outputFile)
+#             ax1 = plotRunawayRateMinorRadius(do, ax=ax1, label=f'{kappa:4.5}')
+#             ax2 = plotFluxSurface(kappa=kappa, ax=ax2, label=f'{kappa:4.5}')
+#
+# else:
+#     raise ValueError('Expected at most one argument.')
+#
+# # plot settings
+# ax1.legend(title=r'Elongation $\kappa$')
+# ax1.set_ylabel(r'runaway rate $\frac{dn_{re}}{dt}$ [s$^{-1}$m$^{-3}$]')
+# ax1.set_xlabel(r'minor radius $r$ [m]')
+# ax2.set_ylabel(r'height $z$ [m]')
+# ax2.set_xlabel(r'major radius $R$ [m]')
+# ax2.yaxis.set_label_position('right')
+# ax2.yaxis.tick_right()
+# ax2.axis([0,1,-.5,.5])
+
 plt.show()

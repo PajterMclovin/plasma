@@ -25,6 +25,8 @@ scanValues = [.1, 1, 10]
 
 if __name__ == "__main__":
 
+    ConfigureDREAM(include=['fluid'],)
+
     for scanValue in scanValues:
         print(scanValue)
 

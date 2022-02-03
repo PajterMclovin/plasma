@@ -29,7 +29,7 @@ plt.rc('ytick', labelsize=SMALL_SIZE)    # y tick labels
 plt.rc('legend', fontsize=SMALL_SIZE)    # legend
 
 # figure size (import this)
-FIGSIZE = (10, 5)
+FIGSIZE = (7, 5)
 
 
 def plotAvalancheMultiplicationFactor(do, ax=None, label=None, normalize=False, show=False, verbose=False):
@@ -79,7 +79,7 @@ def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, ve
     """
     Plot runaway rate vs. time to check convergence. Returns Axes object.
 
-    DREAM.DREAMOutput do :      DREAM settings object.
+    DREAM.DREAMOutput do :      DREAM settings object.2.2e-1
     matplotlib.axes.Axes ax :   Axes object used for plotting.
     str label :                 Legend label.
     bool normalize :            Normalize such that the first element of
@@ -98,7 +98,7 @@ def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, ve
         raise Exception('Output does not include needed data.') from err
 
     if normalize:
-        runawayRate /= runawayRate[0]
+        runawayRate /= p.MINOR_RADIUS
 
     if ax is None:
         ax = plt.axes()
@@ -111,7 +111,7 @@ def plotRunawayRateTime(do, ax=None, label=None, normalize=False, show=False, ve
     return ax
 
 
-def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, show=False, verbose=False):
+def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, c='k', show=False, verbose=False):
     """
     Plot runaway rate vs. the minor radius of the analytical toroidal magnetic
     field to check convergence. Returns Axes object.
@@ -135,12 +135,19 @@ def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, show=Fa
         raise Exception(f'Output does not include needed data.') from err
 
     if normalize:
-        runawayRate /= runawayRate[0]
+
+        # get RR at r=0
+        from scipy.interpolate import interp1d
+        f = interp1d(minorRadius, runawayRate, fill_value='extrapolate')
+        print(f(0))
+
+        runawayRate /= f(0)
+        minorRadius /= p.MINOR_RADIUS
 
     if ax is None:
         ax = plt.axes()
 
-    ax.plot(minorRadius, runawayRate, label=label)
+    ax.plot(minorRadius, runawayRate, label=label, c=c)
 
     if show:
         plt.show()
@@ -148,7 +155,7 @@ def plotRunawayRateMinorRadius(do, ax=None, label=None, normalize=False, show=Fa
     return ax
 
 
-def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, show=False, verbose=False):
+def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, normalize=False, c='k', show=False, verbose=False):
     """
     Plot effective passing fraction associated with a DREAM output geometry.
     Returns Axes object.
@@ -169,10 +176,14 @@ def plotEffectivePassingFractionMinorRadius(do, ax=None, label=None, show=False,
     except AttributeError as err:
         raise Exception(f'Output does not include needed data.') from err
 
+    print(c)
+    if normalize:
+        minorRadius /= minorRadius[-1]
+
     if ax is None:
         ax = plt.axes()
 
-    plt.plot(minorRadius, effectivePassingFraction, label=label)
+    plt.plot(minorRadius, effectivePassingFraction, label=label, ls='--', c=c)
 
     if show:
         plt.show()

@@ -132,7 +132,7 @@ This behaviour is captured in fig.\ \ref{fig:dragForce}.
     \captionsetup{width=.8\textwidth}
     \includegraphics[scale=.6]{figs/dragForce.eps}
     \caption{Illustration of the drag force experienced by a electron with velocity $v$ in a plasma with an electric field $E_\parallel$ in magnetic field direction.
-    The critical velocity $v_\text{c}$ is marked where the drag force becomes smaller than the accelerating force due to the electric field.}
+    The critical velocity $v_\text{c}$ is marked beyond which the drag force becomes smaller than the accelerating force due to the electric field.}
     \label{fig:dragForce}
 \end{figure}
 \noindent
@@ -171,14 +171,15 @@ During a simulation in \textsc{DREAM}, the program keeps track of the runaway ra
 \end{align*}
 where $S$ is the area of the surface and $\mathcal{J}$ is the Jacobian of the spatial coordinate system.
 
+
 In the following sections, we investigate the effect the tokamak geometry have on this flux averaged electron runaway generation individually.
 Firstly, without the Avalanche effect included in the simulations and solely focusing on Dreicer generation $\gamma$, we vary the three shaping parameters individually with the baseline geometry being that of a circular plasma cross section with concentric flux surfaces.
-Furthermore, we also study the effect the toroidicity $\epsilon=r/R_0$ has on the RE generation to compare with a similar investigation by E.\ Nilsson \textit{et al} \cite{Nilsson} which is based on the code \textsc{LUKE}, a solver of the 3D linearized bounce averaged relativistic electron Fokker-Planck equation.
-Then we do the same set of studies focusing in the avalanche multiplication factor $\Gamma$.
+Furthermore, we also study the effect the toroidicity $\epsilon=r/R_0$ has on the RE generation to compare with a similar investigation by E.\ Nilsson \textit{et al} \cite{nilsson} which is based on the code \textsc{LUKE}, a solver of the 3D linearized bounce averaged relativistic electron Fokker-Planck equation.
+Then we do the same set of studies focusing instead on the avalanche multiplication factor $\Gamma$.
 
 \subsection{Dreicer generation}
 \label{sec:dreicer}
-In fig.\ \ref{fig:elongation}, the runaway rates from three different simulation with different orders of magnitude in the elongation $\kappa$ are shown to the left and an outlining of their corresponding tokamak cross sections to the right.
+In fig.\ \ref{fig:elongation}, the runaway rates from three different simulations with different orders of magnitude in the elongation $\kappa$ are shown to the left and an outlining of their corresponding tokamak cross sections to the right.
 The elongation has seemingly no effect on the runaway generation, at least in this range of values.
 Out of all three shaping parameters, this seems to be case only for $\kappa$.
 
@@ -188,7 +189,7 @@ Here we observe that cross sections with geometric centres farther away from the
 \begin{figure}[H]
     \centering
     \captionsetup{width=.8\textwidth}
-    \includegraphics[width=\textwidth]{figs/elongation.eps}
+    \includegraphics[width=.8\textwidth]{figs/elongation.eps}
     \caption{Flux surface averaged electron runaway rate $\langle\diff{n}_{re}/\diff{t}\rangle$ vs.\ minor radius coordinate $r$ for three different elongations $\kappa$ (left), and corresponding tokamak cross sections (right).
     No significant effect of $\kappa$ on the runaway rate is observed.}
     \label{fig:elongation}
@@ -255,19 +256,22 @@ Secondly, an increased $\Delta$ would result in the contrary: fewer trapped part
 \label{sec:avalanche}
 \begin{thebibliography}{100}
     \bibitem{DREAM}
-    M.\ Hoppe, O.\ Embréus, T.\ Fülöp. ''DREAM: A fluid-kinetic framework for tokamak disruption runaway electron simulations''. \textit{Computer Physics Communications} \textbf{268} (2021), p.\ 108098. DOI: \texttt{10.1016/j.cpc.2021.108098}.
+    M.\ Hoppe, O.\ Embréus, T.\ Fülöp. ''DREAM: A fluid-kinetic framework for tokamak disruption runaway electron simulations''. \textit{Computer Physics Communications} \textbf{268} (2021), 108098. DOI: \texttt{10.1016/j.cpc.2021.108098}.
 
     \bibitem{vallhagenMSc}
     O.\ Vallhagen. ''Disruption mitigation in tokamaks with shattered pellet injection''. MSc thesis. Chalmers University of Technology, 2021. URL: \url{https://hdl.handle.net/20.500.12380/302296}.
-
-    \bibitem{hoppePhD}
-    M.\ Hoppe. ''Runaway-electron model development and validation in tokamaks''. PhD thesis. Chalmers University of Technology, 2021. URL: \url{https://research.chalmers.se/publication/527630}.
 
     \bibitem{dreicer1}
     H.\ Dreicer. ''Electron and ion runaway in a fully ionized gas. I''. \textit{Physical Review} \textbf{115} (1959), p.\ 238. DOI: \texttt{10.1103/PhysRev.115.238}.
 
     \bibitem{dreicer2}
     H.\ Dreicer. ''Electron and ion runaway in a fully ionized gas. II''. \textit{Physical Review} \textbf{117} (1960), p.\ 329. DOI: \texttt{10.1103/PhysRev.117.329}.
+
+    \bibitem{hoppePhD}
+    M.\ Hoppe. ''Runaway-electron model development and validation in tokamaks''. PhD thesis. Chalmers University of Technology, 2021. URL: \url{https://research.chalmers.se/publication/527630}.
+
+    \bibitem{nilsson}
+    E.\ Nilsson, J.\ Decker.\ Y.\ Peysson, R.S.\ Granetz, F.\ Saint-Laurent, M.\ Vlainic. ''Kinetic modelling of runaway electron avalanches in tokamak plasmas''. \textit{Plasma Physics and Controlled Fusion} \textbf{57} (2015), 095006. DOI: \texttt{10.1088/0741-3335/57/9/095006}.
 
     % \bibitem{embreus}
     % O.\ Embréus. ''Kinetic modelling of runaway in plasmas''. PhD thesis. Chalmers University of Technology, 2019. URL: \url{https://research.chalmers.se/publication/507022}.
